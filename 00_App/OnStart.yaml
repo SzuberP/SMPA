@@ -1,0 +1,145 @@
+//Fetch data from the db
+// ClearCollect(colPeople, SMA__SQLQuery__People.Run("select * from dbo.People"));
+// ClearCollect(colData, SMA__SQLQuery__Data.Run("select * from dbo.SMA_AT"));
+
+/////////////// For debugging ///////////////
+Set(currentUserEmail, User().Email);
+//Set(currentUserEmail, "naziya.sheikh@smpalliance.co.uk");    
+
+
+ClearCollect(colPeople, People);
+//Below flows are not needed, but hopefully will fix dumb error...
+//ClearCollect(colData_01, flw_GetSQLTableData_01.Run());
+
+// List of GroupsID for Operations, Group ID above 6
+ClearCollect(UserOperationsGroups_Coll,
+            ForAll(Distinct(Filter(
+                Filter(colPeople, Email = currentUserEmail),
+                    GroupID in [7, 8, 9]).Group, Group), {Result: ThisRecord.Value}));
+
+// List of GroupsID for Approvals, Group ID below 6
+ClearCollect(UserApprovalsGroups_Coll,
+            ForAll(Distinct(Filter(
+                Filter(colPeople, Email = currentUserEmail),
+                    GroupID in [1, 2, 3]).Group, Group), {Result: ThisRecord.Value}));    
+
+
+Set(SelectedPerson_Name, "");
+Set(locQuickSearch, false);
+Set(locMassiveApproval, false);
+
+// Set up colours from SMA brand guidelines
+Set(ColorDarkBlue, "#002E5F"); //Pantone Process Blue
+Set(ColorLightBlue, "#008BCB"); //Pantone 282
+Set(ColorBlack, "#4A4A49"); //85% Process Black
+Set(ColorGray, "#BCC5C4"); //Pantone 5507
+Set(ColorRed, "#DC0814"); //Pantone 1797
+Set(ColorWhite, "#ffffff"); //Out of the guidances pallete
+
+// People Gallery Details
+Set(CardH, 15);
+Set(CardW, 45); 
+
+// Main Screen, Person detail pane
+Set(DisplayKeyX, 12);
+Set(DisplayKeyY, 6);
+Set(DisplayKeyH, 34);
+Set(DisplayKeyW, 125);
+Set(DisplayKeyFont, Font.Arial);
+Set(DisplayKeyFontSize, 10);
+Set(DisplayKeyColor, ColorGray);
+
+Set(DisplayValueX, 172);
+Set(DisplayValueY, 5);
+Set(DisplayValueH, 34);
+Set(DisplayValueW, 210);
+Set(DisplayValueFont, Font.Arial);
+Set(DisplayValueFontSize, 10);
+Set(DisplayValueColor, ColorBlack);
+Set(DisplayValueBorderThick, 0.5);
+Set(DisplayValueBorderColor, ColorValue(ColorGray));
+
+// Main Screen, Approvals viewer
+Set(ApprovalKeyX, 0);
+Set(ApprovalKeyY, 0);
+Set(ApprovalKeyH, 70);
+Set(ApprovalKeyW, 200);
+Set(ApprovalKeyFontSize, 12);
+Set(ApprovalKeyFont, Font.Arial);
+Set(ApprovalKeyFontColor, ColorValue(ColorBlack));
+
+Set(ApprovalValueX, 200);
+Set(ApprovalValueY, 0);
+Set(ApprovalValueH, 70);
+Set(ApprovalValueW, 200);
+Set(ApprovalValueFontSize, 12);
+Set(ApprovalValueFont, Font.Arial);
+Set(ApprovalValueFontColor, ColorValue(ColorLightBlue));
+
+Set(ApprovalCardH, 70);
+Set(ApprovalCardW, 415);
+
+Set(ProjectList, [
+    "M3 J9 - 14",
+    "M40 / M42 Interchange",
+    "M62 J20 - J25",
+    "M6 J21a - J26",
+    "SVD",
+    "DHS Enhancements",
+    "NEAR",
+    "M6 J19-21A Options Study",
+    "M1 J35a-39 Options Study",
+    "M1 J21A-23A Options Study",
+    "Biodiversity feasibility",
+    "Not applicable",
+    "All",
+    "TSC Recommendation 1",
+    "DHS Options Study",
+    "ERS Trial - Discovery",
+    "P034 - DF Water Quality",
+    "Nearside Barrier Provision Review on ALR motorways"
+]);
+
+Set(HomeOrgList, [
+    "Balfour Beatty",
+    "BMJV",
+    "Costain",
+    "Fluor",
+    "National Highways",
+    "Jacobs",
+    "Other",
+    "WSP"
+]);
+
+Set(ProductionHubList, [
+    "Alliance Leadership Team (ALT)",
+    "Transformation - Strategy & Transformation",
+    "Transformation - Continuous Improvement & Lean",
+    "Transformation - People",
+    "Transformation - Communications",
+    "Commercial & Procurement - Commercial",
+    "Commercial & Procurement - Procurement",
+    "Development - Customer",
+    "Development - Sustainable Development",
+    "Development - NH Interface",
+    "Development - Designated Funds",
+    "Delivery - Operations",
+    "Delivery - HSWE",
+    "Delivery - Pre-Construction",
+    "Delivery - Finance",
+    "Enterprise Intelligence - Performance & Reporting",
+    "Enterprise Intelligence - System & IT",
+    "Enterprise Intelligence - Digital",
+    "Enterprise Intelligence - Risk & Charge",
+    "Enterprise Intelligence - Cost Management",
+    "Enterprise Intelligence - Planning",
+    "Enterprise Intelligence - Quality"
+]);
+
+Set(SCCHeaderList, [
+    "UK", 
+    "EEA", 
+    "Rest of World"
+    ]);
+    
+
