@@ -1,7 +1,7 @@
 # SMPA
 SMP Portal Aplication
 
-## Flowchart
+## Main approval flow
 
 ```mermaid
 flowchart TD
