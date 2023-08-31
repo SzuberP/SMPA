@@ -10,10 +10,12 @@ How to offboard a PAF?
 4. Click 'Offboard'
 5. Click 'Apply changes'
 
-   flowchart LR
-    A(Offboard button clicked) --> B[Set:\nLevel_calc = 99\nEditComment = 'Offboarding'\nEndDate=<i>Now</i>\nLastEditor = <i>currentUserEmail</i>]
+```mermaid
+flowchart LR
+    A('Apply changes' clicked) --> B[Set:\nLevel_calc = 99\nEditComment = 'Offboarding'\nEndDate=<i>Now</i>\nLastEditor = <i>currentUserEmail</i>]
     B --> C[Run flwOffboardingEmail_01]
     C --> D[Run flwOffboardingSupportEmail]
+```
 
 ### How to see offboarded PAFs?
 How to offboard a PAF?
