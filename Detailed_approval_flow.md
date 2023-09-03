@@ -42,7 +42,7 @@ flowchart LR
     C--> E[Show approval window]
     D--> F[Show rejection window]
     E-->|Approve|G[Set:\nLevel_calc=2\nPM_DIM_Approved=locApprovalText\nLastEditor=<i>currentUserEmail]
-    E --> H{Is 'Reason of rejection' blank?}
+    F --> H{Is 'Reason of rejection' blank?}
     H -->|No|K['Reject' button active]
     K --> |Reject|I[Set:\nRej_calc=1\nPM_DIM_Approved=locRejectText\nRejected=<i>Reason of rejection</i>\nLastEditor=<i>currentUserEmail]
 
