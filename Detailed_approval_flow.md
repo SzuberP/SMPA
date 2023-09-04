@@ -53,22 +53,58 @@ flowchart LR
 
 
 ## Budgetholder
-#### Approve
-``` mermaid
 
+``` mermaid
+flowchart LR
+    J[Database Update]
+    A('Update New Starter Form' button clicked) --> B{Reject or Approve selected?}
+    B -->|Approve|C[Set approval signoff]
+    B -->|Reject|D[Set rejection signoff]
+    C--> E[Show approval window]
+    D--> F[Show rejection window]
+    E-->|Approve|G[Set:\nLevel_calc=4\nPM_DIM_Approved=locApprovalText\nEditComment=Justification for approval\nLastEditor=<i>currentUserEmail]
+    F --> H{Is 'Reason of rejection' blank?}
+    H -->|No|K['Reject' button active]
+    K --> P{PAF's Project = Production Hub}
+    P --> |Yes|I[Set:\nLevel_Calc=3\nPM_DIM_Approved=locRejectText\nLastEditor=<i>currentUserEmail]
+    P --> |No|R[Set:\nRej_calc=1\nPM_DIM_Approved=locRejectText\nLastEditor=<i>currentUserEmail]
+    G --> L[flwOnboardingSupportEmail_01]
+    L --> M[flwBusinessColabEmail]
+    M -->N{Is ProjectWise empty?}
+    N -->|No|O[flwPWTeamEmail_00]
+    
+    style J fill:#CEE39D
+    style I fill:#CEE39D
+    style G fill:#CEE39D
+    style R fill:#CEE39D
+    style L fill:#94DFEE
+    style M fill:#94DFEE
+    style O fill:#94DFEE
 ```
 
-#### Reject
-``` mermaid
-
-```
 ## Alliance Director
-#### Approve
 ``` mermaid
-
-```
-#### Reject
-``` mermaid
-
+flowchart LR
+    J[Database Update]
+    A('Update New Starter Form' button clicked) --> B{Reject or Approve selected?}
+    B -->|Approve|C[Set approval signoff]
+    B -->|Reject|D[Set rejection signoff]
+    C--> E[Show approval window]
+    D--> F[Show rejection window]
+    E-->|Approve|G[Set:\nLevel_calc=4\nPM_DIM_Approved=locApprovalText\nEditComment=Justification for approval\nLastEditor=<i>currentUserEmail]
+    F --> H{Is 'Reason of rejection' blank?}
+    H -->|No|K['Reject' button active]
+    K --> I[Set:\nRej_calc=1\nPM_DIM_Approved=locRejectText\nRejected=<i>Reason of rejection</i>\nLastEditor=<i>currentUserEmail]
+    G --> L[flwOnboardingSupportEmail_01]
+    L --> M[flwBusinessColabEmail]
+    M -->N{Is ProjectWise empty?}
+    N -->|No|O[flwPWTeamEmail_00]
+    
+    style J fill:#CEE39D
+    style I fill:#CEE39D
+    style G fill:#CEE39D
+    style L fill:#94DFEE
+    style M fill:#94DFEE
+    style O fill:#94DFEE
 ```
 
