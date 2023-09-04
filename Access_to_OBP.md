@@ -7,7 +7,7 @@ To give a users access to the Onboarding Portal the following actions are requir
 ```rb
 -- INSERT NEW ROW INTO PEOPLE
 INSERT INTO [dbo].[People] ([Group],[GroupID],[Name],[Email],[Home_organisation],[Project], [PowerUser])		
-VALUES  ('PM/Workstream lead',1,'Martin Spinner','user@smpalliance.co.uk','All','All', 0) 
+VALUES  ('PM/Workstream lead',1,'FIRSTNAME SURNAME','user@smpalliance.co.uk','All','All', 0) 
 ```
 
 ### 2. Create a new user for security
