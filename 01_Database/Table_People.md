@@ -5,13 +5,13 @@ Scope od access is determined by three columns: GroupID, Home_organisation and P
 
 ## Fields
 <ul>
-<li>Group - role name visible on start screen in the App.
+<li>Group - role name visible on start screen in the App
 </li>
-<li>GroupID - groupID determines what is visible in the App.
+<li>GroupID - groupID determines what is visible in the App
 </li>
 <li>Name - SURNAME FIRSTNAME
 </li>
-<li>Email - case sensitive, must be set as in Azure account
+<li>Email - case sensitive, must be set as Azure account
 </li>
 <li>Authority_level - not in use
 </li>
