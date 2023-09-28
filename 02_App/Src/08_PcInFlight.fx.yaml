@@ -1,0 +1,4946 @@
+"'08_PcInFlight' As screen":
+    OnVisible: |-
+        =//Approval Map
+        Set(amColorYes, RGBA(54, 176, 75, 1)); //green
+        Set(amColorNo, RGBA(204, 204, 204, 1)); //gray
+        
+        // Reset mass approval
+        UpdateContext({locMassiveApproval: false});
+        Set(locMassiveApproval, false); 
+        
+        Set(SelectedPerson_ID, Blank());
+        Set(SelectedPerson_Name, Blank());
+        ClearCollect(colMassiveApproval, Blank());
+        
+        // Default mode of details pane is view
+        Set(DetailsFormMode, FormMode.View);
+        
+        // Set val for greyout app
+        Set(locGreyOutVis, false);
+        
+        // User groups for approval
+        ClearCollect(colUserGroups,
+                    ForAll(Distinct(Filter(colPeople, Email = User().Email).Group, Group), {Result: ThisRecord.Value}));
+        
+        // Group IDs of users allowed to approve 
+        Set(gblApprovalsGroupsIDs, [7,8,9]);
+        Set(gblApprovalActive,
+            If(gblUserGroupId_A in gblApprovalsGroupsIDs, true, false));
+        
+        // Approvals visibility as per user group
+        UpdateContext({
+            gblCrdCommercialSignoff: false,
+            gblCrdControlSignoff: false,
+            gblCrdPWAdded: false
+        });
+        
+        
+        If(gblUserGroupId_A = 8, UpdateContext({gblCrdCommercialSignoff: true}));
+        If(gblUserGroupId_A = 7, UpdateContext({gblCrdControlSignoff: true}));
+        If(gblUserGroupId_A = 9, UpdateContext({gblCrdPWAdded: true}));
+        /*If(gblUserGroupId_A = 12, UpdateContext({
+            gblCrdCommercialSignoff: true,
+            gblCrdControlSignoff: true,
+            gblCrdPWAdded: true
+            }));*/
+        
+        // User fields vissibility 
+        
+        UpdateContext({
+            gblCrdTitleVis: true,
+            gblCrdLevelCalcVis: true,
+            gblCrdPAFNumberVis: true,
+            gblCrdHomeOrgVis: true,
+            gblCrdEmailVis: true,
+            gblCrdSMPAEmail: true,
+            gblCrdProject: true, 
+            gblCrdProjectRole: true,
+            gblCrdOfficeLocation: true, 
+            gblCrdSCCHeaderVis: true,
+            gblCrdAccessGroupVis: true,
+            gblCrdStartDateVis: true,
+            gblCrdBPSSVis: true, 
+            gblCrdExpensesVis: true,
+            gblCrdExcessHours: true, 
+            gblCrdCommercialCommentsVis: true,
+            gblCrdSalleryBandVis: true,
+            gblCrdRateVis: true,
+            gblCrdCVLinkVis: true, 
+            gblCrdPhoneNumberVis: true, 
+            gblCrdPhotoLinkVis: true, 
+            gblCrdQualificationVis: true,
+            gblCrdReleventSchemesVis: true, 
+            gblCrdEndDateVis: true,
+            gblCrdDemobilistaionVis: true, 
+            gblCrdComputerVis: true, 
+            gblCrdPWEmailVis: true, 
+            gblCrdJacobsUsrVis: true, 
+            gblCrdResilienceVis: true,
+            gblCrdRequestVis: true,
+            gblCrdPWLevel: false,
+            gblCrdDiscp: false
+        });
+        
+        If(gblUserGroupId_A = 4,
+            UpdateContext({gblCrdCVLinkVis: false, gblCrdPhoneNumberVis: false, glbCrdPhotoLinkVis: false, gblCrdComputerVis: false, gblCrdPWLevelVis: false, 
+                            gblCrdJacobsUsrVis: false, gblCrdResilienceVis: false, gblCrdRequestVis: false}));
+        
+        If(gblUserGroupId_A = 7,
+            UpdateContext({gblCrdCVLinkVis: false, gblCrdPhoneNumberVis: false, gblCrdPhotoLinkVis: false, gblCrdQualificationVis: false, gblCrdReleventSchemesVis: false,
+                            gblCrdComputerVis: false, gblCrdPWLevelVis: false, gblCrdJacobsUsrVis: false, gblCrdRequestVis: false}));
+        
+        If(gblUserGroupId_A = 8,
+            UpdateContext({gblCrdPAFNumberVis: false, gblCrdOfficeLocation: false, gblCrdSCCHeaderVis: false, gblCrdBPSSVis: false, gblCrdExpensesVis: false, 
+                            gblCrdExcessHours: false, gblCrdCVLinkVis: false, gblCrdPhoneNumberVis: false, gblCrdPhotoLinkVis: false, gblCrdQualificationVis: false,
+                            gblCrdReleventSchemesVis: false, gblCrdComputerVis: false, gblCrdPWLevelVis: false, gblCrdJacobsUsrVis: false, gblCrdRequestVis: false}));
+        
+        If(gblUserGroupId_A = 9,
+            UpdateContext({gblCrdPAFNumberVis: false, gblCrdOfficeLocation: false, gblCrdSCCHeaderVis: false, gblCrdBPSSVis: false, gblCrdExpensesVis: false, 
+                            gblCrdExcessHours: false, gblCrdSalleryBandVis: false, gblCrdRateVis: false, gblCrdCVLinkVis: false, gblCrdPhoneNumberVis: false, 
+                            gblCrdPhotoLinkVis: false, gblCrdQualificationVis: false, gblCrdReleventSchemesVis: false, gblCrdResilienceVis: false,
+                            gblCrdRequestVis: false, gblCrdPWLevel: true, gblCrdDiscp: true}));
+        
+        UpdateContext({EmailSentInfo:false});
+
+    shpCenterLineLeft_3 As rectangle:
+        Fill: =ColorValue(ColorLightBlue)
+        Height: =718
+        Width: =2
+        X: =583
+        Y: =50
+        ZIndex: =15
+
+    btnCsvExport_3 As button:
+        BorderColor: =ColorValue(ColorWhite)
+        BorderThickness: =1
+        Color: =ColorValue(ColorWhite)
+        Fill: =RGBA(0, 0, 0, 0)
+        Font: =Font.Lato
+        FontWeight: =FontWeight.Lighter
+        Height: =36
+        HoverColor: =ColorValue(ColorGray)
+        HoverFill: =
+        OnSelect: |-
+            =// Open CSV export popup
+            Set(locPupCsvVisibility, true);
+            Set(locGreyOutVis, true);
+            Set(locLinkToCSV, "empty");
+            
+            Set(locMassiveApproval, false);
+            UpdateContext({EmailSentInfo:false});
+        PaddingBottom: =1
+        PaddingLeft: =1
+        PaddingRight: =1
+        PaddingTop: =1
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Export records to CSV"
+        Width: =225
+        Y: =732
+        ZIndex: =28
+
+    FiltersGroup As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =28
+
+        shpFiltersBackground_5 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =ColorValue(ColorLightBlue)
+            Height: =718
+            Width: =225
+            Y: =50
+            ZIndex: =1
+
+        lblAllFilters_5 As label:
+            Color: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Height: =31
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: ="Filters"
+            Width: =141
+            X: =28
+            Y: =92
+            ZIndex: =2
+
+        rdoProject_8 As radio:
+            Color: =ColorValue(ColorWhite)
+            Default: =Blank()
+            Font: =Font.Lato
+            HoverColor: =ColorValue(ColorGray)
+            Items: |-
+                =ForAll(Distinct(
+                    If(
+                        Text(First(gblUserHomeOrg.Result).Result) <> "All",
+                        Filter(
+                            projectFilter,
+                            HomeOrganisation = Text(First(gblUserHomeOrg.Result).Result)
+                        ),
+                        projectFilter
+                    ),
+                    Project
+                ), {Result: ThisRecord.Value})
+            PaddingBottom: =0
+            PaddingTop: =0
+            RadioBorderColor: =RGBA(116, 116, 116, 1)
+            RadioSize: =18
+            Size: =8
+            Width: =213
+            Y: =160
+            ZIndex: =3
+
+        rdoHomeOrganisation_8 As radio:
+            Color: =ColorValue(ColorWhite)
+            Default: =Blank()
+            Font: =Font.Lato
+            Height: =77
+            HoverColor: =ColorValue(ColorGray)
+            Items: |-
+                =ForAll(Distinct(
+                    If(
+                        Text(First(gblUserHomeOrg.Result).Result) <> "All",
+                        Filter(
+                            SMA_AT5,
+                            HomeOrganisation = Text(First(gblUserHomeOrg.Result).Result)
+                        ),
+                        SMA_AT5
+                    ),
+                    HomeOrganisation
+                ), {Result: ThisRecord.Value})
+            OnChange: =
+            OnSelect: =
+            PaddingBottom: =0
+            PaddingTop: =0
+            RadioBorderColor: =RGBA(116, 116, 116, 1)
+            RadioSize: =18
+            Size: =8
+            Width: =213
+            Y: =303
+            ZIndex: =4
+
+        rdoGroup_8 As radio:
+            Color: =ColorValue(ColorWhite)
+            Default: =Blank()
+            Font: =Font.Lato
+            Height: =213
+            HoverColor: =ColorValue(ColorGray)
+            Items: |-
+                =ForAll(Distinct(
+                    If(
+                        Text(First(gblUserHomeOrg.Result).Result) <> "All",
+                        Filter(
+                            disciplineFilter,
+                            HomeOrganisation = Text(First(gblUserHomeOrg.Result).Result),
+                            Discipline <> "ALT"
+                        ),
+                        disciplineFilter
+                    ),
+                    Discipline
+                ), {Result: ThisRecord.Value})
+            PaddingBottom: =0
+            PaddingTop: =0
+            RadioBorderColor: =RGBA(116, 116, 116, 1)
+            RadioSize: =18
+            Size: =8
+            Width: =213
+            Y: =427
+            ZIndex: =5
+
+        txtNameSearchPM_1 As text:
+            BorderColor: =ColorValue(ColorLightBlue)
+            BorderThickness: =1
+            Default: =""
+            Height: =50
+            HintText: ="Search Name"
+            HoverBorderColor: =ColorValue(ColorLightBlue)
+            HoverFill: =ColorValue(ColorGray)
+            Italic: =true
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Width: =308
+            X: =225
+            Y: =50
+            ZIndex: =6
+
+        btnClearprojects_5 As button:
+            BorderColor: =ColorValue(ColorWhite)
+            BorderThickness: =1
+            Color: =ColorValue(ColorWhite)
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Lighter
+            Height: =23
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =// Reseting project radio on click
+                
+                Reset(rdoProject_8)
+            PaddingBottom: =1
+            PaddingLeft: =1
+            PaddingRight: =1
+            PaddingTop: =1
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Text: ="Clear"
+            Width: =50
+            X: =166
+            Y: =128
+            ZIndex: =7
+
+        lblProjects_5 As label:
+            Color: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Height: =31
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =10
+            Text: ="Projects"
+            Underline: =true
+            Width: =141
+            X: =28
+            Y: =123
+            ZIndex: =8
+
+        lblHome_5 As label:
+            Color: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Height: =31
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =10
+            Text: ="Home Organisation"
+            Underline: =true
+            Width: =141
+            X: =28
+            Y: =269
+            ZIndex: =9
+
+        lblDiscipline_5 As label:
+            Color: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Height: =31
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =10
+            Text: ="Discipline"
+            Underline: =true
+            Width: =141
+            X: =28
+            Y: =389
+            ZIndex: =10
+
+        btnClearTextSearch_5 As button:
+            BorderColor: =Color.White
+            BorderThickness: =0
+            Color: =ColorValue(ColorWhite)
+            Fill: =ColorValue(ColorGray)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Lighter
+            Height: =50
+            HoverColor: =ColorValue(ColorWhite)
+            HoverFill: =ColorValue(ColorLightBlue)
+            OnSelect: |-
+                =// Reseting HomeOrganization radio on click
+                
+                Reset(txtNameSearchPM_1)
+            PaddingBottom: =1
+            PaddingLeft: =1
+            PaddingRight: =1
+            PaddingTop: =1
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Text: ="Clear"
+            Width: =50
+            X: =533
+            Y: =50
+            ZIndex: =11
+
+        btnClearHome_5 As button:
+            BorderColor: =ColorValue(ColorWhite)
+            BorderThickness: =1
+            Color: =ColorValue(ColorWhite)
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Lighter
+            Height: =23
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =// Reseting project radio on click
+                
+                Reset(rdoHomeOrganisation_8)
+            PaddingBottom: =1
+            PaddingLeft: =1
+            PaddingRight: =1
+            PaddingTop: =1
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Text: ="Clear"
+            Width: =50
+            X: =166
+            Y: =273
+            ZIndex: =12
+
+        btnClearDiscipline_5 As button:
+            BorderColor: =ColorValue(ColorWhite)
+            BorderThickness: =1
+            Color: =ColorValue(ColorWhite)
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Lighter
+            Height: =23
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =// Reseting project radio on click
+                
+                Reset(rdoGroup_8)
+            PaddingBottom: =1
+            PaddingLeft: =1
+            PaddingRight: =1
+            PaddingTop: =1
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Text: ="Clear"
+            Width: =50
+            X: =166
+            Y: =394
+            ZIndex: =13
+
+        btnClearAllfilters_5 As button:
+            BorderColor: =ColorValue(ColorWhite)
+            BorderThickness: =1
+            Color: =ColorValue(ColorWhite)
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Lighter
+            Height: =23
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =// Reseting project radio on click
+                
+                Reset(rdoProject_8);
+                Reset(rdoHomeOrganisation_8);
+                Reset(rdoGroup_8)
+            PaddingBottom: =1
+            PaddingLeft: =1
+            PaddingRight: =1
+            PaddingTop: =1
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Text: ="Clear all filters"
+            Width: =182
+            X: =21
+            Y: =666
+            ZIndex: =14
+
+        "galPeopleFilters_8 As gallery.'BrowseLayout_Vertical_ThreeTextVariant_ver4.0'":
+            BorderColor: =ColorValue(ColorLightBlue)
+            Height: =667
+            Items: |
+                =// Series of Ifs and filters to apply settings from filtters and search box
+                // Starting with if to val if current people or offboarded and then val if search field is empty
+                
+                
+                // Set of filters for current PAF's (Level_Calc <> 99) if toggle Offboarded is false
+                Filter(If(tglOffboarded.Value=false,
+                
+                // Offboarded false & search field not empty    
+                If(!IsBlank(txtNameSearchPM_1.Text),
+                    // Search with filters
+                    Search(
+                    If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result), 
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99),
+                    If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank    (rdoProject_8.Selected.Result), Filter(SMA_AT5, Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation =rdoHomeOrganisation_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99))))))))),
+                txtNameSearchPM_1.Text, "Title"),
+                
+                // Offboarded false & search field empty -> conditions for filters       
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result), 
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99),
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, 
+                    Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99)))))))))),
+                
+                
+                // Set of filters for offboarded PAF's (Level_Calc = 99) 
+                // Search field not empty
+                If(!IsBlank(txtNameSearchPM_1.Text),
+                    Search(
+                    If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Level_Calc=99),
+                    If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank    (rdoProject_8.Selected.Result), 
+                        Filter(SMA_AT5, Project = rdoProject_8.Selected.Result And Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation =rdoHomeOrganisation_8.Selected.Result And Level_Calc=99),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                        Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                    If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result ), 
+                Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc=99),
+                    If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                Filter(SMA_AT5, 
+                Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc=99))))))))),
+                txtNameSearchPM_1.Text, "Email", "Discipline"),
+                
+                // Search field empty    
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Level_Calc=99),
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Project = rdoProject_8.Selected.Result And Level_Calc=99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Level_Calc=99),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc=99),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc=99),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, 
+                    Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result And Level_Calc=99))))))))))    
+                    ), !Rej_calc)
+                
+                
+                
+                /*
+                Filter(If(!IsBlank(txtNameSearchPM_1PM.Text),
+                Search(
+                
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    SMA_AT5, 
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result),
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Project = rdoProject_8.Selected.Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Project = rdoProject_8.Selected.Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, 
+                    Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result))))))))),
+                    
+                txtNameSearchPM_1PM.Text, "Title"),
+                    
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    SMA_AT5, 
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result),
+                If(rdoGroup_8.Selected.Result = Blank() And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Project = rdoProject_8.Selected.Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And rdoProject_8.Selected.Result = Blank(), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And rdoHomeOrganisation_8.Selected.Result = Blank() And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, Discipline = rdoGroup_8.Selected.Result And Project = rdoProject_8.Selected.Result),
+                If(rdoGroup_8.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result),
+                If(!IsBlank(rdoGroup_8.Selected.Result) And !IsBlank(rdoHomeOrganisation_8.Selected.Result) And !IsBlank(rdoProject_8.Selected.Result), 
+                    Filter(SMA_AT5, 
+                    Discipline = rdoGroup_8.Selected.Result And HomeOrganisation = rdoHomeOrganisation_8.Selected.Result And Project = rdoProject_8.Selected.Result)))))))))), !Rej_calc)
+                */
+            Layout: =Layout.Vertical
+            OnSelect: =
+            TemplatePadding: =0
+            TemplateSize: =88
+            Width: =360
+            X: =225
+            Y: =101
+            ZIndex: =20
+
+            RectGrayBgSelected_4 As rectangle:
+                Fill: =RGBA(230, 230, 230, 1)
+                Height: =88
+                Visible: =If(ThisItem.ID2 = SelectedPerson_ID, true, false)
+                Width: =360
+                ZIndex: =1
+
+            Title2_14 As label:
+                Color: =ColorValue(ColorDarkBlue)
+                Height: =21
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Title
+                VerticalAlign: =VerticalAlign.Top
+                Width: =273
+                X: =32
+                Y: =12
+                ZIndex: =2
+
+            Subtitle2_11 As label:
+                Color: =ColorValue(ColorBlack)
+                Height: =22
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: |-
+                    ="Discipline: " & ThisItem.Discipline
+                VerticalAlign: =VerticalAlign.Top
+                Width: =273
+                X: =32
+                Y: =Title2_14.Y + Title2_14.Height + 1
+                ZIndex: =3
+
+            Body2_11 As label:
+                Color: =ColorValue(ColorBlack)
+                Height: =23
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: |-
+                    ="Project: " & ThisItem.Project
+                VerticalAlign: =VerticalAlign.Top
+                Width: =273
+                X: =32
+                Y: =Subtitle2_11.Y + Subtitle2_11.Height + 1
+                ZIndex: =4
+
+            NextArrow2_14 As icon.ChevronRight:
+                AccessibleLabel: =Self.Tooltip
+                Color: =ColorValue(ColorLightBlue)
+                Height: =60
+                HoverColor: =ColorValue(ColorGray)
+                Icon: =Icon.ChevronRight
+                OnSelect: |+
+                    =// Set variable for gallery look up
+                    Set(SelectedPerson_ID, ThisItem.ID2);
+                    Set(SelectedPerson_Name, ThisItem.Title);
+                    Set(locRequestorEmail, ThisItem.Email);
+                    Set(locRequestorProject, ThisItem.Project);
+                    Set(locRequestorLevel, ThisItem.Level_Calc);
+                    Set(locRequestorSalaryBand, ThisItem.SalaryBand);
+                    Set(locRequestorEndDate, ThisItem.EndDate);
+                    
+                    
+                    // Create new PAF number
+                    Set(SelectedPAF, ThisItem.PAFNumber);
+                    If(Len(SelectedPAF)=7,Set(LatestRevision, Right(SelectedPAF, 1)));  // Get current Revision
+                    If(Len(SelectedPAF)=8,Set(LatestRevision, Right(SelectedPAF, 2)));
+                    Set(NewRevision, Text(Value(LatestRevision)+1));
+                    Set(NewPAFNumber, Left(SelectedPAF, 6) & NewRevision);
+                    
+                    Set(locSelectedPersonStartDate, ThisItem.StartDate);
+                    Set(locSelectedPersonEndDate, ThisItem.EndDate);
+                    
+                    Set(locSelectedPersonProject, ThisItem.Project);
+                    Set(locSelectedPersonHomeOrg, ThisItem.HomeOrganisation);
+                    Set(locSelectedPersonProductionHub, ThisItem.ProductionHub);
+                    
+                    
+                PaddingBottom: =10
+                PaddingLeft: =10
+                PaddingRight: =10
+                PaddingTop: =10
+                TabIndex: =0
+                Tooltip: ="View item details"
+                Width: =60
+                X: =Parent.TemplateWidth - Self.Width - 5
+                Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                ZIndex: =5
+
+            Separator2_14 As rectangle:
+                BorderColor: =RGBA(237, 237, 237, 1)
+                BorderThickness: =0.5
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =1
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =Parent.TemplateHeight - 1
+                ZIndex: =6
+
+    grpHeaderMain_3 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =20
+        ZIndex: =31
+
+        shpHeaderBackground_3 As rectangle:
+            Fill: =ColorValue(ColorDarkBlue)
+            Height: =50
+            Width: =1366
+            ZIndex: =16
+
+        btnHome_3 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =Navigate('01_Intro', ScreenTransition.Fade); Set(SelectedPerson_Name, "");
+                Set(locApprovalText, ""); Set(locMassiveApproval, false); UpdateContext({popOffboarding: false});
+                Set(SelectedPerson_ID, Blank());
+                Set(SelectedPerson_Name, Blank())
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Home"
+            Width: =86
+            X: =139
+            Y: =5
+            ZIndex: =17
+
+        lblSMP_7 As label:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            Height: =30
+            HoverBorderColor: =lblSMP_7.BorderColor
+            HoverColor: =lblSMP_7.Color
+            HoverFill: =lblSMP_7.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =lblSMP_7.BorderColor
+            PressedColor: =lblSMP_7.Color
+            PressedFill: =lblSMP_7.Fill
+            Size: =12
+            Text: ="SMP "
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =36
+            X: =18
+            ZIndex: =18
+
+        lblAccess_7 As label:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            Height: =26
+            HoverBorderColor: =lblAccess_7.BorderColor
+            HoverColor: =lblAccess_7.Color
+            HoverFill: =lblAccess_7.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =lblAccess_7.BorderColor
+            PressedColor: =lblAccess_7.Color
+            PressedFill: =lblAccess_7.Fill
+            Size: =8
+            Text: ="SMP Alliance Portal"
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =112
+            X: =23
+            Y: =20
+            ZIndex: =19
+
+        lblAlliance_7 As label:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Height: =29
+            HoverBorderColor: =lblAlliance_7.BorderColor
+            HoverColor: =lblAlliance_7.Color
+            HoverFill: =lblAlliance_7.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =lblAlliance_7.BorderColor
+            PressedColor: =lblAlliance_7.Color
+            PressedFill: =lblAlliance_7.Fill
+            Size: =12
+            Text: ="Alliance"
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =69
+            X: =54
+            ZIndex: =21
+
+        btnHelp_3 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: =Navigate('05_Help', ScreenTransition.Fade); Set(SelectedPerson_Name, ""); Set(locMassiveApproval, false); 
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Help"
+            Width: =86
+            X: =225
+            Y: =5
+            ZIndex: =22
+
+        btnContact_3 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: =Navigate('06_Contact', ScreenTransition.Fade); Set(SelectedPerson_Name, ""); Set(locMassiveApproval, false); 
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Contact"
+            Width: =86
+            X: =316
+            Y: =5
+            ZIndex: =23
+
+        btnAdmin_3 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =If(gblUserGroupId_A = 7, Navigate('07_Admin', ScreenTransition.Fade)); 
+                Set(SelectedPerson_Name, ""); Set(locMassiveApproval, false); Reset(toggleMassiveApproval)
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Admin"
+            Width: =86
+            X: =420
+            Y: =5
+            ZIndex: =24
+
+        shpHeader_7 As rectangle:
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =40
+            Width: =1
+            X: =130
+            Y: =5
+            ZIndex: =25
+
+        txtUserEmail_3 As label:
+            Align: =Align.Right
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =ColorValue(ColorWhite)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            Height: =48
+            HoverBorderColor: =txtUserEmail_3.BorderColor
+            HoverColor: =txtUserEmail_3.Color
+            HoverFill: =txtUserEmail_3.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =txtUserEmail_3.BorderColor
+            PressedColor: =txtUserEmail_3.Color
+            PressedFill: =txtUserEmail_3.Fill
+            Size: =8
+            Text: |-
+                ="Logged as: " & User().Email
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =337
+            X: =951
+            ZIndex: =26
+
+        imgUser_3 As image:
+            Height: =37
+            Image: =User().Image
+            Width: =47
+            X: =1302
+            Y: =8
+            ZIndex: =27
+
+    btnReject_1 As button:
+        BorderColor: =ColorValue(ColorDarkBlue)
+        BorderThickness: =0.5
+        Color: =ColorValue(ColorWhite)
+        DisplayMode: =If(!IsBlank(SelectedPerson_Name) Or SelectedPerson_Name <> "" Or CountRows(colMassiveApproval) > 0, DisplayMode.Edit, DisplayMode.Disabled)
+        Fill: =Color.Red
+        Font: =Font.Lato
+        Height: =31
+        HoverColor: =ColorValue(ColorWhite)
+        HoverFill: =ColorValue(ColorGray)
+        OnSelect: |-
+            =Set(locPcRejPopUpVis, true);
+            Reset(txtRejectionNote);
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Abort Application"
+        Visible: =gblApprovalActive And !locMassiveApproval And gblUserGroupId_A = 7
+        Width: =144
+        X: =1117
+        Y: =328
+        ZIndex: =45
+
+    ProgressLabel As group:
+        Height: =5
+        Width: =5
+        X: =-649
+        Y: =-650
+        ZIndex: =45
+
+        arrowLvl1_l_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 1, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =672
+            Y: =689
+            ZIndex: =29
+
+        lblLevel1_1 As label:
+            Align: =Align.Center
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 1, amColorNo, amColorYes)
+            Height: =32
+            Size: =10
+            Text: ="Project Controls"
+            Width: =78
+            X: =698
+            Y: =692
+            ZIndex: =30
+
+        arrowLvl1_r_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 1, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =779
+            Y: =689
+            ZIndex: =31
+
+        rectLvl1_1 As rectangle:
+            Fill: =If(galPeopleFilters_8.Selected.Level_Calc < 1, amColorNo, amColorYes)
+            Height: =4
+            Width: =133
+            X: =670
+            Y: =735
+            ZIndex: =32
+
+        arrowLvl2_l_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 2, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =827
+            Y: =689
+            ZIndex: =33
+
+        lblLevel2_1 As label:
+            Align: =Align.Center
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 2, amColorNo, amColorYes)
+            Height: =32
+            Size: =10
+            Text: ="National Highways"
+            Width: =78
+            X: =853
+            Y: =692
+            ZIndex: =34
+
+        arrowLvl2_r_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 2, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =934
+            Y: =689
+            ZIndex: =35
+
+        rectLvl2_1 As rectangle:
+            Fill: =If(galPeopleFilters_8.Selected.Level_Calc < 2, amColorNo, amColorYes)
+            Height: =4
+            Width: =133
+            X: =825
+            Y: =735
+            ZIndex: =36
+
+        arrowLvl3_l_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 3, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =981
+            Y: =689
+            ZIndex: =37
+
+        lblLevel3_1 As label:
+            Align: =Align.Center
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 3, amColorNo, amColorYes)
+            Height: =32
+            Size: =10
+            Text: ="Workstream Lead"
+            Width: =90
+            X: =1007
+            Y: =692
+            ZIndex: =38
+
+        arrowLvl3_r_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 3, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =1088
+            Y: =689
+            ZIndex: =39
+
+        rectLvl3_1 As rectangle:
+            Fill: =If(galPeopleFilters_8.Selected.Level_Calc < 3, amColorNo, amColorYes)
+            Height: =4
+            Width: =133
+            X: =979
+            Y: =735
+            ZIndex: =40
+
+        arrowLvl4_l_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 4, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =1136
+            Y: =689
+            ZIndex: =41
+
+        lblLevel4_1 As label:
+            Align: =Align.Center
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 4, amColorNo, amColorYes)
+            Height: =32
+            Size: =10
+            Text: ="Fully Approved"
+            Width: =78
+            X: =1162
+            Y: =692
+            ZIndex: =42
+
+        arrowLvl4_r_1 As icon.ChevronRight:
+            Color: =If(galPeopleFilters_8.Selected.Level_Calc < 4, amColorNo, amColorYes)
+            DisplayMode: =DisplayMode.View
+            Height: =46
+            Icon: =Icon.ChevronRight
+            Width: =26
+            X: =1243
+            Y: =689
+            ZIndex: =43
+
+        rectLvl4_1 As rectangle:
+            Fill: =If(galPeopleFilters_8.Selected.Level_Calc < 4, amColorNo, amColorYes)
+            Height: =4
+            Width: =133
+            X: =1134
+            Y: =735
+            ZIndex: =44
+
+    btnReject_2 As button:
+        BorderColor: =ColorValue(ColorDarkBlue)
+        BorderThickness: =0.5
+        Color: =ColorValue(ColorWhite)
+        DisplayMode: =If(!IsBlank(SelectedPerson_Name) Or SelectedPerson_Name <> "" Or CountRows(colMassiveApproval) > 0, DisplayMode.Edit, DisplayMode.Disabled)
+        Fill: =ColorValue(ColorLightBlue)
+        Font: =Font.Lato
+        Height: =44
+        HoverColor: =ColorValue(ColorWhite)
+        HoverFill: =ColorValue(ColorGray)
+        OnSelect: |+
+            =Set(locEmailPopUpVis, true);
+            Reset(txtEmailNote);
+            
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Nudge Next Approver"
+        Visible: =gblApprovalActive And !locMassiveApproval And gblUserGroupId_A = 7
+        Width: =144
+        X: =1117
+        Y: =373
+        ZIndex: =50
+
+    frmDetails_3 As form:
+        AcceptsFocus: =false
+        DataSource: =SMA_AT5
+        DefaultMode: =DetailsFormMode
+        Height: =575
+        Item: =LookUp(SMA_AT5, ID2=SelectedPerson_ID)
+        NumberOfColumns: =1
+        SnapToColumns: =false
+        Visible: =If(IsBlank(SelectedPerson_Name) Or SelectedPerson_Name = "", false, true)
+        Width: =442
+        X: =585
+        Y: =103
+        ZIndex: =51
+
+        crdPAFNumber_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="PAFNumber"
+            Default: =ThisItem.PAFNumber
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="PAF Number"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "PAFNumber")
+            Required: =false
+            Update: =cardPAFNumber_3.Text
+            Visible: =gblCrdPAFNumberVis
+            Width: =504
+            WidthFit: =true
+            X: =0
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey60_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardPAFNumber_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =If(Parent.DisplayMode = DisplayMode.View, Parent.Default, NewPAFNumber)
+                DelayOutput: =true
+                DisplayMode: =DisplayMode.View 
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage57_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardPAFNumber_3.Y + cardPAFNumber_3.Height
+                ZIndex: =3
+
+            StarVisible57_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey60_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey60_3.Y
+                ZIndex: =4
+
+        Title_DataCard1_1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Title"
+            Default: =ThisItem.Title
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@SMA_AT5],DataSourceInfo.DisplayName,"Title")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "Title")
+            Required: =false
+            Update: =DataCardValue59_1.Text
+            Width: =504
+            X: =1
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey78_1 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =Font.Arial
+                Height: =25
+                Size: =10
+                Text: ="Name"
+                Width: =117
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue59_1 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =0.5
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =Font.Arial
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =171
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage62_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue59_1.Y + DataCardValue59_1.Height
+                ZIndex: =3
+
+            StarVisible63_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey78_1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey78_1.Y
+                ZIndex: =4
+
+        Preferred_Name_DataCard1_1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Preferred_Name"
+            Default: =ThisItem.Preferred_Name
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@SMA_AT5],DataSourceInfo.DisplayName,"Preferred_Name")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "Preferred_Name")
+            Required: =false
+            Update: =DataCardValue67_1.Text
+            Width: =483
+            X: =1
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey52_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =Font.Arial
+                Height: =34
+                Size: =10
+                Text: ="Preferred Name"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue67_1 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =Font.Arial
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage1_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue67_1.Y + DataCardValue67_1.Height
+                ZIndex: =3
+
+            StarVisible49_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey52_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey52_3.Y
+                ZIndex: =4
+
+        crdResilience_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Resilience"
+            Default: =ThisItem.Resilience
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Resilience"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "Resilience")
+            Required: =false
+            Update: =cardResilience_3.Text
+            Visible: =false
+            Width: =504
+            WidthFit: =true
+            X: =2
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey83_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardResilience_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage80_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardResilience_3.Y + cardResilience_3.Height
+                ZIndex: =3
+
+            StarVisible80_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey83_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey83_3.Y
+                ZIndex: =4
+
+        crdHomeOrg_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="HomeOrganisation"
+            Default: =ThisItem.HomeOrganisation
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Home Org."
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "HomeOrganisation")
+            Required: =false
+            Update: =cardHomeOrg_3.Text
+            Visible: =gblCrdHomeOrgVis
+            Width: =504
+            WidthFit: =true
+            X: =2
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey37_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =25
+                Size: =DisplayKeyFontSize
+                Text: ="Partner Organisation"
+                Width: =134
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardHomeOrg_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =locSelectedPersonHomeOrg
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                OnSelect: |-
+                    =Set(pupHomeOrgPicker, true);
+                    Set(locGreyOutVis,true);
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage35_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardHomeOrg_3.Y + cardHomeOrg_3.Height
+                ZIndex: =3
+
+            StarVisible35_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey37_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey37_3.Y
+                ZIndex: =4
+
+        crdSCCHeader_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SCCHeader"
+            Default: =ThisItem.SCCHeader
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="SCC Header"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "SCCHeader")
+            Required: =false
+            Update: =cardSCCHeader_3.Text
+            Visible: =gblCrdSCCHeaderVis
+            Width: =504
+            WidthFit: =true
+            X: =3
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey86_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: ="Residency"
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardSCCHeader_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =locSelectedPersonSCCHeader
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                OnSelect: |-
+                    =Set(pupSCCHeaderPicker, true);
+                    Set(locGreyOutVis,true);
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage83_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardSCCHeader_3.Y + cardSCCHeader_3.Height
+                ZIndex: =3
+
+            StarVisible83_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey86_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey86_3.Y
+                ZIndex: =4
+
+        crdOfficeLocation_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="OfficeLocation"
+            Default: =ThisItem.OfficeLocation
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Office Location"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "OfficeLocation")
+            Required: =false
+            Update: =cardOfficeLoc_3.Text
+            Visible: =gblCrdOfficeLocation
+            Width: =504
+            WidthFit: =true
+            X: =1
+            Y: =1
+            ZIndex: =1
+
+            DataCardKey58_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: |-
+                    ="Office/ Country 
+                    Location"
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardOfficeLoc_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage55_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardOfficeLoc_3.Y + cardOfficeLoc_3.Height
+                ZIndex: =3
+
+            StarVisible55_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey58_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey58_3.Y
+                ZIndex: =4
+
+        crdEmail_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Email"
+            Default: =ThisItem.Email
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Email"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "Email")
+            Required: =false
+            Update: =cardEmail_3.Text
+            Visible: =gblCrdEmailVis
+            Width: =207
+            WidthFit: =true
+            X: =2
+            Y: =1
+            ZIndex: =1
+
+            DataCardKey26_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =25
+                Size: =DisplayKeyFontSize
+                Text: ="Partner Email address"
+                Width: =146
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardEmail_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage24_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardEmail_3.Y + cardEmail_3.Height
+                ZIndex: =3
+
+            StarVisible24_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey26_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey26_3.Y
+                ZIndex: =4
+
+        crdJacobsUsername_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="JacobsUsername"
+            Default: =ThisItem.JacobsUsername
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Jacobs Username"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "JacobsUsername")
+            Required: =false
+            Update: =DataCardValue48_3.Text
+            Visible: =gblCrdJacobsUsrVis
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =2
+            ZIndex: =1
+
+            DataCardKey46_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue48_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage43_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue48_3.Y + DataCardValue48_3.Height
+                ZIndex: =3
+
+            StarVisible43_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey46_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey46_3.Y
+                ZIndex: =4
+
+        crdPW_Email_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="PW_Email"
+            Default: =ThisItem.PW_Email
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="PW Email"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "PW_Email")
+            Required: =false
+            Update: =cardPWEmail_3.Text
+            Visible: =false
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =3
+            ZIndex: =1
+
+            DataCardKey71_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardPWEmail_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Format: =
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage68_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardPWEmail_3.Y + cardPWEmail_3.Height
+                ZIndex: =3
+
+            StarVisible68_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey71_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey71_3.Y
+                ZIndex: =4
+
+        crdComputerID_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ComputerID"
+            Default: =ThisItem.ComputerID
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Computer ID"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "ComputerID")
+            Required: =false
+            Update: =DataCardValue4_3.Text
+            Visible: =gblCrdComputerVis
+            Width: =415
+            X: =0
+            Y: =4
+            ZIndex: =1
+
+            DataCardKey4_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyY
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue4_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage4_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue4_3.Y + DataCardValue4_3.Height
+                ZIndex: =3
+
+            StarVisible4_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey4_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey4_3.Y
+                ZIndex: =4
+
+        crdDemobilisationDate_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="DemobilisationDate"
+            Default: =ThisItem.DemobilisationDate
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Demobilisation Date"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "DemobilisationDate")
+            Required: =false
+            Update: =cardDemobDate_3.Text
+            Visible: =false
+            Width: =512
+            X: =0
+            Y: =5
+            ZIndex: =1
+
+            DataCardKey3_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardDemobDate_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage3_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardDemobDate_3.Y + cardDemobDate_3.Height
+                ZIndex: =3
+
+            StarVisible3_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey3_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey3_3.Y
+                ZIndex: =4
+
+        crdReleventSchemes_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ReleventSchemes"
+            Default: =ThisItem.ReleventSchemes
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Relevent Schemes"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "ReleventSchemes")
+            Required: =false
+            Update: =DataCardValue82_3.Text
+            Visible: =gblCrdReleventSchemesVis
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =7
+            ZIndex: =1
+
+            DataCardKey80_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue82_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage77_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue82_3.Y + DataCardValue82_3.Height
+                ZIndex: =3
+
+            StarVisible77_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey80_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey80_3.Y
+                ZIndex: =4
+
+        crdQualification_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Qualification"
+            Default: =ThisItem.Qualification
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Qualification"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "Qualification")
+            Required: =false
+            Update: =DataCardValue77_3.Text
+            Visible: =gblCrdQualificationVis
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =8
+            ZIndex: =1
+
+            DataCardKey75_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue77_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage72_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue77_3.Y + DataCardValue77_3.Height
+                ZIndex: =3
+
+            StarVisible72_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey75_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey75_3.Y
+                ZIndex: =4
+
+        crdPhotoLink_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="PhotoLink"
+            Default: =ThisItem.PhotoLink
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Photo Link"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "PhotoLink")
+            Required: =false
+            Update: =DataCardValue66_3.Text
+            Visible: =gblCrdPhotoLinkVis
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =9
+            ZIndex: =1
+
+            DataCardKey64_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue66_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage61_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue66_3.Y + DataCardValue66_3.Height
+                ZIndex: =3
+
+            StarVisible61_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey64_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey64_3.Y
+                ZIndex: =4
+
+        crdPhoneNumber_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="PhoneNumber"
+            Default: =ThisItem.PhoneNumber
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Phone Number"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "PhoneNumber")
+            Required: =false
+            Update: =DataCardValue65_3.Text
+            Visible: =gblCrdPhoneNumberVis
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =10
+            ZIndex: =1
+
+            DataCardKey63_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue65_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage60_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue65_3.Y + DataCardValue65_3.Height
+                ZIndex: =3
+
+            StarVisible60_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey63_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey63_3.Y
+                ZIndex: =4
+
+        crdCVLink_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CVLink"
+            Default: =ThisItem.CVLink
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="CV Link"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "CVLink")
+            Required: =false
+            Update: =DataCardValue22_3.Text
+            Visible: =gblCrdCVLinkVis
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =11
+            ZIndex: =1
+
+            DataCardKey20_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue22_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =DisplayValueW
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage20_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue22_3.Y + DataCardValue22_3.Height
+                ZIndex: =3
+
+            StarVisible20_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey20_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey20_3.Y
+                ZIndex: =4
+
+        crdRate_Main_3 As typedDataCard.numberEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Rate"
+            Default: =ThisItem.Rate
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Rate"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            Required: =false
+            Update: =Value(cardRate_3.Text)
+            Visible: =false
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =12
+            ZIndex: =1
+
+            DataCardKey77_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardRate_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Format: =TextFormat.Number
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage74_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardRate_3.Y + cardRate_3.Height
+                ZIndex: =3
+
+            StarVisible74_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey77_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey77_3.Y
+                ZIndex: =4
+
+        crdCommercialComments_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CommercialComments"
+            Default: =ThisItem.CommercialComments
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Comm. Comments"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "CommercialComments")
+            Required: =false
+            Update: =cardCommComments_3.Text
+            Visible: =false
+            Width: =415
+            WidthFit: =true
+            X: =0
+            Y: =14
+            ZIndex: =1
+
+            DataCardKey13_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardCommComments_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage13_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardCommComments_3.Y + cardCommComments_3.Height
+                ZIndex: =3
+
+            StarVisible13_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey13_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey13_3.Y
+                ZIndex: =4
+
+        crdExcessHours_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ExcessHours"
+            Default: =ThisItem.ExcessHours
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Excess Hours"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "ExcessHours")
+            Required: =false
+            Update: =cardExcessHours_3.Text
+            Visible: =false
+            Width: =363
+            WidthFit: =true
+            X: =0
+            Y: =15
+            ZIndex: =1
+
+            DataCardKey31_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardExcessHours_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage29_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardExcessHours_3.Y + cardExcessHours_3.Height
+                ZIndex: =3
+
+            StarVisible29_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey31_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey31_3.Y
+                ZIndex: =4
+
+        crdProject_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Project"
+            Default: =ThisItem.Project
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Project"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "Project")
+            Required: =false
+            Update: =cardProject_3.Text
+            Visible: =gblCrdProject
+            Width: =504
+            WidthFit: =true
+            X: =1
+            Y: =15
+            ZIndex: =1
+
+            DataCardKey68_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: |-
+                    ="Scheme/ Project/ 
+                    Production Hub"
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardProject_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =locSelectedPersonProject
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                OnSelect: |-
+                    =Set(pupProjectPicker, true);
+                    Set(locGreyOutVis,true);
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage65_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardProject_3.Y + cardProject_3.Height
+                ZIndex: =3
+
+            StarVisible65_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey68_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey68_3.Y
+                ZIndex: =4
+
+        crdProjectRole_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ProjectRole"
+            Default: =ThisItem.ProjectRole
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Project Role"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "ProjectRole")
+            Required: =false
+            Update: =cardProjRole_3.Text
+            Visible: =gblCrdProjectRole
+            Width: =415
+            WidthFit: =true
+            X: =2
+            Y: =15
+            ZIndex: =1
+
+            DataCardKey70_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardProjRole_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage67_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardProjRole_3.Y + cardProjRole_3.Height
+                ZIndex: =3
+
+            StarVisible67_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey70_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey70_3.Y
+                ZIndex: =4
+
+        crdStartDate_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="StartDate"
+            Default: =ThisItem.StartDate
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Start Date"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "StartDate")
+            Required: =false
+            Update: =cardStartDate_3.Text
+            Visible: =gblCrdStartDateVis
+            Width: =504
+            WidthFit: =true
+            X: =0
+            Y: =17
+            ZIndex: =1
+
+            DataCardKey90_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =34
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardStartDate_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =locSelectedPersonStartDate
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                OnSelect: |-
+                    =Set(pupDatePicker, true);
+                    Set(locSetDate, "START");
+                    Set(locGreyOutVis,true);
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage87_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardStartDate_3.Y + cardStartDate_3.Height
+                ZIndex: =3
+
+            StarVisible87_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey90_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey90_3.Y
+                ZIndex: =4
+
+        crdEndDateExtension_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="EndDate"
+            Default: =ThisItem.EndDate
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="End Date"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "EndDateExtension")
+            Required: =false
+            Update: =cardEndDateExt_3.Text
+            Visible: =gblCrdEndDateVis
+            Width: =504
+            WidthFit: =true
+            X: =1
+            Y: =17
+            ZIndex: =1
+
+            DataCardKey29_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardEndDateExt_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: |-
+                    =//If(Parent.DisplayMode = Edit, crdEndData_DatePicker.SelectedDate, Parent.Default)
+                    locSelectedPersonEndDate
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                OnSelect: |-
+                    =Set(pupDatePicker, true);
+                    Set(locSetDate, "END");
+                    Set(locGreyOutVis,true);
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Visible: |-
+                    =//If(Parent.DisplayMode = Edit, false, true)
+                    true
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage27_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardEndDateExt_3.Y + cardEndDateExt_3.Height
+                ZIndex: =3
+
+            StarVisible27_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey29_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey29_3.Y
+                ZIndex: =4
+
+            crdEndData_DatePicker_2 As datepicker:
+                DefaultDate: =Parent.Default
+                Height: =DisplayValueH
+                Visible: |-
+                    =//If(Parent.DisplayMode = Edit, true, false)
+                    false
+                Width: =302
+                X: =172
+                Y: =1
+                ZIndex: =5
+
+        crdSalaryBand_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SalaryBand"
+            Default: =ThisItem.SalaryBand
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Salary Band"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "SalaryBand")
+            Required: =false
+            Update: =cardSalaryBand_3.Text
+            Visible: =gblCrdSalleryBandVis
+            Width: =207
+            WidthFit: =true
+            X: =2
+            Y: =17
+            ZIndex: =1
+
+            DataCardKey84_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardSalaryBand_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage81_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardSalaryBand_3.Y + cardSalaryBand_3.Height
+                ZIndex: =3
+
+            StarVisible81_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey84_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey84_3.Y
+                ZIndex: =4
+
+        crdBPSS_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="BPSS"
+            Default: =ThisItem.BPSS
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="BPSS"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "BPSS")
+            Required: =false
+            Update: =cardBPSS_3.Text
+            Visible: =false
+            Width: =504
+            X: =0
+            Y: =18
+            ZIndex: =1
+
+            DataCardKey2_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardBPSS_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =313
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage2_9 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardBPSS_3.Y + cardBPSS_3.Height
+                ZIndex: =3
+
+            StarVisible2_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey2_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey2_3.Y
+                ZIndex: =4
+
+        crdAccessGroup_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AccessGroup"
+            Default: =ThisItem.AccessGroup
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Access Group"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "AccessGroup")
+            Required: =false
+            Update: =cardAccessGroup_3.Text
+            Visible: =false
+            Width: =408
+            X: =0
+            Y: =19
+            ZIndex: =1
+
+            DataCardKey1_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardAccessGroup_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage1_4 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardAccessGroup_3.Y + cardAccessGroup_3.Height
+                ZIndex: =3
+
+            StarVisible1_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey1_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey1_3.Y
+                ZIndex: =4
+
+        ProductionHub_DataCard2_1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ProductionHub"
+            Default: =ThisItem.ProductionHub
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@SMA_AT5],DataSourceInfo.DisplayName,"ProductionHub")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "ProductionHub")
+            Required: =false
+            Update: =DataCardValue58_1.Text
+            Visible: =If(ThisItem.Project = "Production Hub", true, false)
+            Width: =490
+            X: =1
+            Y: =23
+            ZIndex: =1
+
+            DataCardKey76_1 As label:
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =Font.Arial
+                Height: =25
+                Size: =10
+                Text: ="Production Hub"
+                Width: =110
+                Wrap: =false
+                X: =13
+                Y: =17
+                ZIndex: =1
+
+            DataCardValue58_1 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                OnSelect: |-
+                    =Set(pupProdHubPicker, true);
+                    Set(locGreyOutVis,true);
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =172
+                Y: =10
+                ZIndex: =2
+
+            ErrorMessage59_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue58_1.Y + DataCardValue58_1.Height
+                ZIndex: =3
+
+            StarVisible62_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey76_1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey76_1.Y
+                ZIndex: =4
+
+        crdSMPAEmail_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SMPAEmail"
+            Default: =ThisItem.SMPAEmail
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="SMPA Email"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "SMPAEmail")
+            Required: =false
+            Update: =cardSMPAEmail_3.Text
+            Visible: =false
+            Width: =401
+            WidthFit: =true
+            X: =0
+            Y: =24
+            ZIndex: =1
+
+            DataCardKey88_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =34
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardSMPAEmail_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =locSelectedPersonProductionHub
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage85_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardSMPAEmail_3.Y + cardSMPAEmail_3.Height
+                ZIndex: =3
+
+            StarVisible85_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey88_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey88_3.Y
+                ZIndex: =4
+
+        crdLevelCalc_Main_3 As typedDataCard.numberEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Level_Calc"
+            Default: =locRequestorLevelCalc
+            DisplayMode: =DisplayMode.View
+            DisplayName: ="Approval Level"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            Required: =true
+            Update: |-
+                =//Value(cardApprovalLevel_1.Text)
+                locRequestorLevelCalc
+            Visible: =false
+            Width: =408
+            WidthFit: =true
+            X: =0
+            Y: =28
+            ZIndex: =1
+
+            DataCardKey52_4 As label:
+                AutoHeight: =true
+                Color: =ColorValue(DisplayKeyColor)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: =Parent.DisplayName
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =12
+                Y: =8
+                ZIndex: =1
+
+            cardApprovalLevel_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =locRequestorLevelCalc
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Format: =TextFormat.Number
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =172
+                ZIndex: =2
+
+            ErrorMessage49_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardApprovalLevel_3.Y + cardApprovalLevel_3.Height
+                ZIndex: =3
+
+            StarVisible49_4 As label:
+                Align: =Align.Center
+                Height: =DataCardKey52_4.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey52_4.Y
+                ZIndex: =4
+
+        LastEditor_DataCard2_2 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="LastEditor"
+            Default: =ThisItem.LastEditor
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@SMA_AT5],DataSourceInfo.DisplayName,"LastEditor")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "LastEditor")
+            Required: =false
+            Update: =DataCardValue32_2.Text
+            Visible: =false
+            Width: =504
+            X: =0
+            Y: =618
+            ZIndex: =1
+
+            DataCardKey41_2 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =35
+                Y: =5
+                ZIndex: =1
+
+            DataCardValue32_2 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =User().Email
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.6
+                X: =DataCardKey41_2.X + DataCardKey41_2.Width
+                Y: =10
+                ZIndex: =2
+
+            ErrorMessage41_2 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue32_2.Y + DataCardValue32_2.Height
+                ZIndex: =3
+
+            StarVisible44_2 As label:
+                Align: =Align.Center
+                Height: =DataCardKey41_2.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey41_2.Y
+                ZIndex: =4
+
+        crdExpenses_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Expenses"
+            Default: =ThisItem.Expenses
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Expenses"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "Expenses")
+            Required: =false
+            Update: =cardExpenses_3.Text
+            Visible: =gblCrdExpensesVis
+            Width: =408
+            WidthFit: =true
+            X: =0
+            Y: =619
+            ZIndex: =1
+
+            DataCardKey32_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =25
+                Size: =DisplayKeyFontSize
+                Text: ="Expenses Permitted?"
+                Width: =144
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            cardExpenses_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =DisplayValueY
+                ZIndex: =2
+
+            ErrorMessage30_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =cardExpenses_3.Y + cardExpenses_3.Height
+                ZIndex: =3
+
+            StarVisible30_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey32_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey32_3.Y
+                ZIndex: =4
+
+        EditComment_DataCard1_2 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="EditComment"
+            Default: =ThisItem.EditComment
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@SMA_AT5],DataSourceInfo.DisplayName,"EditComment")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "EditComment")
+            Required: =false
+            Update: =DataCardValue49_2.Text
+            Visible: =false
+            Width: =504
+            X: =1
+            Y: =619
+            ZIndex: =1
+
+            DataCardKey61_2 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue49_2.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue49_2 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =txtEditComment.Text
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.6
+                X: =DataCardKey61_2.X + DataCardKey61_2.Width
+                Y: =10
+                ZIndex: =2
+
+            ErrorMessage47_2 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue49_2.Y + DataCardValue49_2.Height
+                ZIndex: =3
+
+            StarVisible48_2 As label:
+                Align: =Align.Center
+                Height: =DataCardKey61_2.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey61_2.Y
+                ZIndex: =4
+
+        Prod_FullPartTime_DataCard3_1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Prod_FullPartTime"
+            Default: =ThisItem.Prod_FullPartTime
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@SMA_AT5],DataSourceInfo.DisplayName,"Prod_FullPartTime")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo([@SMA_AT5], DataSourceInfo.MaxLength, "Prod_FullPartTime")
+            Required: =false
+            Update: =DataCardValue68_1.Text
+            Width: =483
+            X: =2
+            Y: =619
+            ZIndex: =1
+
+            DataCardKey71_4 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =Font.Arial
+                Height: =34
+                Size: =10
+                Text: |-
+                    ="Expectation of 
+                    normal hours"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue68_1 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =Font.Arial
+                Height: =DisplayValueH
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =5
+                ZIndex: =2
+
+            ErrorMessage37_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue68_1.Y + DataCardValue68_1.Height
+                ZIndex: =3
+
+            StarVisible59_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey71_4.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey71_4.Y
+                ZIndex: =4
+
+        crdRequester_Main_3 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Requester"
+            Default: =ThisItem.Requester
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: ="Requester"
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =CardH
+            MaxLength: =DataSourceInfo(SMA_AT5, DataSourceInfo.MaxLength, "Requester")
+            Required: =false
+            Update: =DataCardValue84_3.Text
+            Visible: =true
+            Width: =42
+            WidthFit: =true
+            X: =3
+            Y: =619
+            ZIndex: =1
+
+            DataCardKey82_3 As label:
+                AutoHeight: =true
+                Color: =ColorValue(ColorDarkBlue)
+                Font: =DisplayKeyFont
+                Height: =DisplayKeyH
+                Size: =DisplayKeyFontSize
+                Text: ="Requestor's email"
+                Width: =DisplayKeyW
+                Wrap: =false
+                X: =DisplayKeyX
+                Y: =DisplayKeyY
+                ZIndex: =1
+
+            DataCardValue84_3 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =DisplayValueBorderThick
+                Color: =ColorValue(DisplayValueColor)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Font: =DisplayValueFont
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =DisplayValueFontSize
+                Tooltip: =Parent.DisplayName
+                Width: =310
+                X: =DisplayValueX
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage79_3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue84_3.Y + DataCardValue84_3.Height
+                ZIndex: =3
+
+            StarVisible79_3 As label:
+                Align: =Align.Center
+                Height: =DataCardKey82_3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey82_3.Y
+                ZIndex: =4
+
+    lblLastEditorDetails_2 As group:
+        Height: =5
+        Width: =5
+        X: =-971
+        Y: =-62
+        ZIndex: =51
+
+        Label17_8 As label:
+            Height: =47
+            Size: =8
+            Text: |-
+                ="Last editor: " & LookUp(SMA_AT5, ID2=SelectedPerson_ID).LastEditor
+            Width: =339
+            X: =1027
+            Y: =104
+            ZIndex: =46
+
+        Label17_9 As label:
+            Height: =43
+            Size: =8
+            Text: |-
+                ="Last edit: " & LookUp(SMA_AT5, ID2=SelectedPerson_ID).SysStartTime
+            Width: =283
+            X: =1027
+            Y: =143
+            ZIndex: =47
+
+        Label17_10 As label:
+            Height: =44
+            Size: =8
+            Text: |
+                ="Edit Comment: " & LookUp(SMA_AT5, ID2=SelectedPerson_ID).EditComment
+            Width: =338
+            X: =1027
+            Y: =161
+            ZIndex: =48
+
+        Label17_11 As label:
+            Height: =43
+            Size: =8
+            Text: |-
+                ="Editor organisation: " & LookUp(People, Email = (LookUp(SMA_AT5, ID2=SelectedPerson_ID).LastEditor)).Home_organisation
+            Width: =283
+            X: =1027
+            Y: =125
+            ZIndex: =49
+
+    lblApprovalTop_5 As label:
+        Align: =Align.Center
+        Color: =ColorValue(ColorWhite)
+        Fill: =ColorValue(ColorLightBlue)
+        Font: =Font.Lato
+        FontWeight: =FontWeight.Bold
+        Height: =51
+        Text: ="Approval details"
+        Width: =417
+        X: =949
+        Y: =50
+        ZIndex: =52
+
+    lblApprovalTop_4 As label:
+        Align: =Align.Center
+        Color: =ColorValue(ColorWhite)
+        Fill: =ColorValue(ColorLightBlue)
+        Font: =Font.Lato
+        FontWeight: =FontWeight.Bold
+        Height: =51
+        Text: =SelectedPerson_Name
+        Width: =423
+        X: =583
+        Y: =50
+        ZIndex: =53
+
+    pupReject_1 As groupContainer.manualLayoutContainer:
+        BorderColor: =ColorValue(ColorDarkBlue)
+        BorderThickness: =1.5
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =344
+        Visible: =locPcRejPopUpVis
+        Width: =839
+        X: =264
+        Y: =212
+        ZIndex: =54
+
+        lblApprovalPup1_9 As label:
+            Align: =Align.Center
+            Font: =Font.Arial
+            Height: =42
+            Text: |-
+                ="I am rejecting " & SelectedPerson_Name & " request as: "
+            Width: =838
+            Y: =38
+            ZIndex: =2
+
+        btnRejectApproval_7 As button:
+            BorderColor: =ColorValue(ColorRed)
+            Color: =ColorValue(ColorRed)
+            Fill: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            Height: =31
+            HoverColor: =ColorValue(ColorWhite)
+            HoverFill: =ColorValue(ColorRed)
+            OnSelect: |-
+                =Set(locPcRejPopUpVis, false);
+                Set(locGreyOutVis, false);
+                Reset(txtRejectionNote_2);
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Cancel"
+            Width: =144
+            X: =145
+            Y: =263
+            ZIndex: =3
+
+        btnApplyEdit_11 As button:
+            BorderThickness: =1
+            DisplayMode: |-
+                =If(!IsBlank(txtRejectionNote_2),
+                    DisplayMode.Edit,
+                    DisplayMode.Disabled)
+            Fill: =ColorValue(ColorLightBlue)
+            Font: =Font.Arial
+            Height: =31
+            HoverFill: =ColorValue(ColorGray)
+            OnSelect: |-
+                =// show processing label
+                Set(locLblProcessingVis, true);
+                
+                Patch(
+                    SMA_AT5,
+                    {ID2: SelectedPerson_ID},
+                    {Level_Calc: 0},
+                    {Rejected: txtRejectionNote_2.Text},
+                    {ControlSignoff: Blank()},
+                    {EditComment: "Rejected during approval process by_" & User().Email & "_" & Text(Now(), "[$-en-US]mm/dd/yyyy hh:mm:ss")},
+                    {LastEditor: User().Email}
+                );
+                
+                Set(locPcRejPopUpVis, false);
+                
+                // Send email 
+                flwRejectPCEmail_01.Run(locRequestorEmail, locRequestorProject, User().Email, txtRejectionNote_2.Text);
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Apply changes"
+            X: =534
+            Y: =263
+            ZIndex: =4
+
+        lblApprovalPup1_10 As label:
+            Align: =Align.Center
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Semibold
+            Height: =42
+            Text: =User().Email
+            Width: =838
+            Y: =80
+            ZIndex: =5
+
+        txtRejectionNote_2 As text:
+            BorderColor: =RGBA(179, 179, 179, 1)
+            Default: =
+            Height: =44
+            HoverBorderColor: =ColorValue(ColorLightBlue)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            MaxLength: =250
+            PressedBorderColor: =ColorValue(ColorLightBlue)
+            Width: =572
+            X: =145
+            Y: =172
+            ZIndex: =6
+
+        lblApprovalPup1_11 As label:
+            Align: =Align.Center
+            Font: =Font.Arial
+            Height: =42
+            Text: |-
+                ="Reason of rejection:"
+            Width: =838
+            Y: =126
+            ZIndex: =7
+
+    pupRename As groupContainer.manualLayoutContainer:
+        BorderColor: =ColorValue(ColorDarkBlue)
+        BorderThickness: =1.5
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =344
+        Visible: =locEmailPopUpVis
+        Width: =839
+        X: =264
+        Y: =212
+        ZIndex: =55
+
+        lblApprovalPup1_12 As label:
+            Align: =Align.Center
+            Font: =Font.Arial
+            Height: =44
+            Text: |-
+                ="Send notification to approver: "
+            Width: =256
+            X: =145
+            Y: =36
+            ZIndex: =2
+
+        btnRejectApproval_8 As button:
+            BorderColor: =ColorValue(ColorRed)
+            Color: =ColorValue(ColorRed)
+            Fill: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            Height: =31
+            HoverColor: =ColorValue(ColorWhite)
+            HoverFill: =ColorValue(ColorRed)
+            OnSelect: =Set(locEmailPopUpVis, false);
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Cancel"
+            Width: =144
+            X: =145
+            Y: =263
+            ZIndex: =3
+
+        btnApplyEdit_13 As button:
+            BorderThickness: =1
+            DisplayMode: |-
+                =If(!IsBlank(txtEmailNote),
+                    DisplayMode.Edit,
+                    DisplayMode.Disabled)
+            Fill: =ColorValue(ColorLightBlue)
+            Font: =Font.Arial
+            Height: =31
+            HoverFill: =ColorValue(ColorGray)
+            OnSelect: |-
+                =// show processing label
+                Set(locApproverName, Dropdown1.Selected.Name);
+                Set(locApproverEmail, LookUp(People, Level_Calc = locRequestorLevel And Name = locApproverName).Email); 
+                
+                Set(locEmailText, "<font family=Calibri>Hello " & locApproverName & "," & 
+                "<br><br>Please log onto the Onboarding Portal to review and approve the application for " & SelectedPerson_Name &
+                "<br><br><a href=""https://apps.powerapps.com/play/e/default-cb90aad5-1e27-401d-9d34-6942573202e8/a/4cc19372-a953-443a-a9a6-ef2e9351ca51"">Power Apps<a>"& 
+                "<br><br>Message from the project controls:<br>" &  
+                txtEmailNote.Text &
+                "<br><br>Kind Regards<br>"&User().FullName);   
+                Office365Outlook.SendEmail(locApproverEmail, "Urgent Approval Required - " & locRequestorName, locEmailText, {IsHtml:true, Importance: "Normal"});
+                Set(locEmailTimer, true)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Send Email to Approver"
+            Width: =266
+            X: =427
+            Y: =263
+            ZIndex: =4
+
+        txtEmailNote As text:
+            BorderColor: =RGBA(179, 179, 179, 1)
+            Default: =
+            Height: =44
+            HoverBorderColor: =ColorValue(ColorLightBlue)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            MaxLength: =250
+            PressedBorderColor: =ColorValue(ColorLightBlue)
+            Width: =572
+            X: =133
+            Y: =134
+            ZIndex: =6
+
+        lblApprovalPup1_14 As label:
+            Align: =Align.Center
+            Font: =Font.Arial
+            Height: =42
+            Text: |-
+                ="Notification comment:"
+            Width: =838
+            Y: =92
+            ZIndex: =7
+
+        Dropdown1 As dropdown:
+            BorderColor: =ColorValue(ColorLightBlue)
+            ChevronHoverBackground: =ColorValue(ColorLightBlue)
+            ChevronHoverFill: =ColorValue(ColorLightBlue)
+            Height: =44
+            HoverColor: =ColorValue(ColorLightBlue)
+            HoverFill: =ColorValue(ColorWhite)
+            Items: =Filter(People, Level_Calc = locRequestorLevel And (Project = RemoveFlags.All Or Project = locRequestorProject) And (Home_organisation = locRequestorHomeOrg Or Home_organisation = RemoveFlags.All) And PowerUser = false).Name
+            Width: =301
+            X: =401
+            Y: =36
+            ZIndex: =8
+
+    pupCsvExport_3 As groupContainer.manualLayoutContainer:
+        BorderColor: =ColorValue(ColorDarkBlue)
+        BorderThickness: =1
+        Fill: =ColorValue(ColorWhite)
+        Height: =694
+        Visible: =locPupCsvVisibility
+        Width: =941
+        X: =213
+        Y: =37
+        ZIndex: =56
+
+        grpPupHeader_4 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =7
+
+            shpPupHeader_6 As rectangle:
+                Fill: =ColorValue(ColorDarkBlue)
+                Height: =42
+                Width: =941
+                ZIndex: =1
+
+            lblSMP_11 As label:
+                BorderColor: =RGBA(0, 0, 0, 1)
+                Color: =RGBA(255, 255, 255, 1)
+                DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+                Font: =Font.Lato
+                Height: =27
+                HoverBorderColor: =lblSMP_11.BorderColor
+                HoverColor: =lblSMP_11.Color
+                HoverFill: =lblSMP_11.Fill
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                PressedBorderColor: =lblSMP_11.BorderColor
+                PressedColor: =lblSMP_11.Color
+                PressedFill: =lblSMP_11.Fill
+                Size: =12
+                Text: ="SMP "
+                Visible: =If(!FormPattern.Details, true,false)
+                Width: =36
+                X: =5
+                ZIndex: =3
+
+            lblAccess_11 As label:
+                BorderColor: =RGBA(0, 0, 0, 1)
+                Color: =RGBA(255, 255, 255, 1)
+                DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+                Font: =Font.Lato
+                Height: =24
+                HoverBorderColor: =lblAccess_11.BorderColor
+                HoverColor: =lblAccess_11.Color
+                HoverFill: =lblAccess_11.Fill
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                PressedBorderColor: =lblAccess_11.BorderColor
+                PressedColor: =lblAccess_11.Color
+                PressedFill: =lblAccess_11.Fill
+                Size: =8
+                Text: ="SMP Alliance Portal"
+                Visible: =If(!FormPattern.Details, true,false)
+                Width: =112
+                X: =10
+                Y: =18
+                ZIndex: =4
+
+            lblAlliance_11 As label:
+                BorderColor: =RGBA(0, 0, 0, 1)
+                Color: =RGBA(255, 255, 255, 1)
+                DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Bold
+                Height: =26
+                HoverBorderColor: =lblAlliance_11.BorderColor
+                HoverColor: =lblAlliance_11.Color
+                HoverFill: =lblAlliance_11.Fill
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                PressedBorderColor: =lblAlliance_11.BorderColor
+                PressedColor: =lblAlliance_11.Color
+                PressedFill: =lblAlliance_11.Fill
+                Size: =12
+                Text: ="Alliance"
+                Visible: =If(!FormPattern.Details, true,false)
+                Width: =69
+                X: =41
+                ZIndex: =5
+
+            shpHeader_11 As rectangle:
+                Fill: =RGBA(255, 255, 255, 1)
+                Height: |
+                    =38
+                Width: =1
+                X: =110
+                Y: =2
+                ZIndex: =6
+
+        cntRigtPanel_6 As groupContainer.manualLayoutContainer:
+            Height: =652
+            Width: =310
+            X: =631
+            Y: =42
+            ZIndex: =22
+
+            btnClose_7 As button:
+                BorderColor: =ColorValue(ColorRed)
+                Color: =ColorValue(ColorRed)
+                Fill: =ColorValue(ColorWhite)
+                Font: =Font.Lato
+                Height: =31
+                HoverColor: =ColorValue(ColorWhite)
+                HoverFill: =ColorValue(ColorRed)
+                OnSelect: |-
+                    =Set(locPupCsvVisibility, false);
+                    Set(locGreyOutVis, false);
+                    UpdateContext({EmailSentInfo:false});
+                    Clear(colPeopleToExport)
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =12
+                Text: ="Close"
+                X: =75
+                Y: =589
+                ZIndex: =1
+
+            btnCheckAll_3 As button:
+                BorderColor: =ColorValue(ColorLightBlue)
+                Color: =ColorValue(ColorLightBlue)
+                DisplayMode: =DisplayMode.Disabled
+                Fill: |
+                    =ColorValue(ColorWhite)
+                Font: =Font.Arial
+                Height: =30
+                OnSelect: =ClearCollect(colPeopleToExport, AddColumns(colAllPeople, "ChoosenToExport", true))
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Text: ="Select All"
+                Width: =127
+                X: =21
+                Y: =12
+                ZIndex: =2
+
+            btnUnCheckAll_3 As button:
+                BorderColor: =ColorValue(ColorLightBlue)
+                Color: =ColorValue(ColorLightBlue)
+                DisplayMode: =DisplayMode.Disabled
+                Fill: |
+                    =ColorValue(ColorWhite)
+                Font: =Font.Arial
+                Height: =30
+                OnSelect: =ClearCollect(colPeopleToExport, AddColumns(colAllPeople, "ChoosenToExport", false))
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Text: ="Unselect All"
+                Width: =127
+                X: =160
+                Y: =12
+                ZIndex: =3
+
+            btnExportAsJSON_3 As export:
+                Data: =Filter(colPeopleToExport, ChoosenToExport = true)
+                Fill: =ColorValue(ColorDarkBlue)
+                Font: =Font.Arial
+                Height: =60
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Text: ="Export Data as JSON"
+                Width: =200
+                X: =55
+                Y: =204
+                ZIndex: =4
+
+            btnExportCSV_3 As button:
+                Fill: =ColorValue(ColorDarkBlue)
+                Font: =Font.Arial
+                Height: =60
+                OnSelect: |-
+                    =//Below fields cannot be passed to flow as blank
+                    UpdateIf(colPeopleToExport, IsBlank(Discipline), {Discipline: "None"});
+                    UpdateIf(colPeopleToExport, IsBlank(HomeOrganisation), {HomeOrganisation: "None"});
+                    UpdateIf(colPeopleToExport, IsBlank(Project), {Project: "None"});
+                    
+                    Set(locDataToExport, Text(JSON(DropColumns(Filter(colPeopleToExport, ChoosenToExport = true And IsBlank(ID2) = false), "ChoosenToExport"))));
+                    flwCreateCsvAndSendv2.Run(locDataToExport, User().Email);
+                    UpdateContext({EmailSentInfo: true})
+                    //Set(locLinkToCSV, flwDownloadAsCsv.Run(locDataToExport).linkoutput)
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Text: ="Export Data as CSV"
+                Width: =200
+                X: =55
+                Y: =315
+                ZIndex: =5
+
+            lblCSVLink_4 As label:
+                Color: =RGBA(99, 139, 44, 1)
+                Font: =Font.Arial
+                FontWeight: =FontWeight.Lighter
+                Height: =110
+                Text: |-
+                    =//"Link to CSV table: https://smpalliancetest-my.sharepoint.com/:f:/r/personal/piotr_szubert_smpalliancetest_onmicrosoft_com/Documents" & locLinkToCSV
+                    "The file has been sent to your email"
+                VerticalAlign: =VerticalAlign.Top
+                Visible: |-
+                    =//If(locLinkToCSV = "empty", false, true)
+                    EmailSentInfo
+                Width: =249
+                X: =33
+                Y: =427
+                ZIndex: =6
+
+            lblLinktToCSV_3 As text:
+                Default: |-
+                    ="Link to CSV table: https://smpalliancetest-my.sharepoint.com/:f:/r/personal/piotr_szubert_smpalliancetest_onmicrosoft_com/Documents" & locLinkToCSV
+                DisplayMode: =DisplayMode.Disabled
+                Height: =133
+                Mode: =TextMode.MultiLine
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =9
+                Visible: =If(locLinkToCSV = "empty", false, true)
+                Width: =278
+                X: =32
+                Y: =427
+                ZIndex: =7
+
+        grpPupFilters_4 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =-50
+            ZIndex: =22
+
+            "galPeopleFilters_7 As gallery.'BrowseLayout_Vertical_ThreeTextVariant_ver4.0'":
+                BorderColor: =ColorValue(ColorLightBlue)
+                Height: =605
+                Items: |-
+                    =// Series of Ifs and filters to apply settings from filtters and search box
+                    // Starting with if to val if search field is empty
+                    AddColumns(
+                    Filter(If(!IsBlank(txtNameSearch_4.Text),
+                    Search(
+                    
+                    If(rdoGroup_7.Selected.Result = Blank() And rdoHomeOrganisation_7.Selected.Result = Blank() And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result), 
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And rdoHomeOrganisation_7.Selected.Result = Blank() And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Discipline = rdoGroup_7.Selected.Result),
+                    If(rdoGroup_7.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result),
+                    If(rdoGroup_7.Selected.Result = Blank() And rdoHomeOrganisation_7.Selected.Result = Blank() And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Project = rdoProject_7.Selected.Result),
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And Discipline = rdoGroup_7.Selected.Result And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result),
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And rdoHomeOrganisation_7.Selected.Result = Blank() And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Discipline = rdoGroup_7.Selected.Result And Project = rdoProject_7.Selected.Result),
+                    If(rdoGroup_7.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result And Project = rdoProject_7.Selected.Result),
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And 
+                        Discipline = rdoGroup_7.Selected.Result And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result And Project = rdoProject_7.Selected.Result))))))))),
+                        
+                    txtNameSearch_4.Text, "Email", "Discipline"),
+                        
+                    If(rdoGroup_7.Selected.Result = Blank() And rdoHomeOrganisation_7.Selected.Result = Blank() And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result), 
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And rdoHomeOrganisation_7.Selected.Result = Blank() And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Discipline = rdoGroup_7.Selected.Result),
+                    If(rdoGroup_7.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result),
+                    If(rdoGroup_7.Selected.Result = Blank() And rdoHomeOrganisation_7.Selected.Result = Blank() And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Project = rdoProject_7.Selected.Result),
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And rdoProject_7.Selected.Result = Blank(), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And Discipline = rdoGroup_7.Selected.Result And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result),
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And rdoHomeOrganisation_7.Selected.Result = Blank() And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = First(gblUserHomeOrg.Result).Result And Discipline = rdoGroup_7.Selected.Result And Project = rdoProject_7.Selected.Result),
+                    If(rdoGroup_7.Selected.Result = Blank() And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result And Project = rdoProject_7.Selected.Result),
+                    If(!IsBlank(rdoGroup_7.Selected.Result) And !IsBlank(rdoHomeOrganisation_7.Selected.Result) And !IsBlank(rdoProject_7.Selected.Result), 
+                        Filter(SMA_AT5, Level_Calc <> 0 And Level_Calc <> 4 And Level_Calc <> 99 And 
+                        Discipline = rdoGroup_7.Selected.Result And HomeOrganisation = rdoHomeOrganisation_7.Selected.Result And Project = rdoProject_7.Selected.Result)))))))))), !Rej_calc),
+                    
+                        "ChoosenToExport", locSelectAllCSVExport)
+                Layout: =Layout.Vertical
+                OnSelect: =
+                TemplatePadding: =0
+                TemplateSize: =88
+                Width: =398
+                X: =233
+                Y: =89
+                ZIndex: =7
+
+                Title2_13 As label:
+                    Color: =ColorValue(ColorDarkBlue)
+                    Height: =Self.Size * 1.8
+                    OnSelect: =Select(Parent)
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Size: =12
+                    Text: =ThisItem.Title
+                    VerticalAlign: =VerticalAlign.Top
+                    Width: =Parent.TemplateWidth - 104
+                    X: =32
+                    Y: =16
+                    ZIndex: =1
+
+                Subtitle2_10 As label:
+                    Color: =ColorValue(ColorBlack)
+                    Height: =Self.Size * 1.8
+                    OnSelect: =Select(Parent)
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Size: =10
+                    Text: |-
+                        ="Discipline: " & ThisItem.Discipline
+                    VerticalAlign: =VerticalAlign.Top
+                    Width: =Parent.TemplateWidth - 104
+                    X: =32
+                    Y: =Title2_13.Y + Title2_13.Height + 2
+                    ZIndex: =2
+
+                Body2_10 As label:
+                    Color: =ColorValue(ColorBlack)
+                    Height: =30
+                    OnSelect: =Select(Parent)
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Size: =10
+                    Text: |-
+                        ="Project: " & ThisItem.Project
+                    VerticalAlign: =VerticalAlign.Top
+                    Width: =315
+                    X: =32
+                    Y: =57
+                    ZIndex: =3
+
+                Separator2_13 As rectangle:
+                    BorderColor: =RGBA(237, 237, 237, 1)
+                    BorderThickness: =0.5
+                    Fill: =RGBA(0, 0, 0, 0)
+                    Height: =1
+                    OnSelect: =Select(Parent)
+                    Width: =Parent.TemplateWidth
+                    Y: =Parent.TemplateHeight - 1
+                    ZIndex: =5
+
+                btnIsChoosenToExport_3 As checkbox:
+                    CheckboxBorderColor: =ColorValue(ColorGray)
+                    CheckboxSize: =30
+                    Default: =ThisItem.ChoosenToExport
+                    Height: =41
+                    OnCheck: |
+                        =Collect(colPeopleToExport, {
+                            Title: ThisItem.Title,
+                            ID2: ThisItem.ID2,
+                            HomeOrganisation: ThisItem.HomeOrganisation,
+                            Email: ThisItem.Email,
+                            Project: ThisItem.Project,
+                            Discipline: ThisItem.Project,
+                            PM_DIM_Approved: ThisItem.PM_DIM_Approved,
+                            Final_Comments: ThisItem.Final_Comments,
+                            PWAdded: ThisItem.PWAdded,
+                            UKBased: ThisItem.UKBased,
+                            StartDate: ThisItem.StartDate,
+                            EndDate: ThisItem.EndDate,
+                            EndDateExtension: ThisItem.EndDate,
+                            Qualification: ThisItem.Qualification,
+                            QualYear: ThisItem.QualYear,
+                            OtherQualification: ThisItem.OtherQualification,
+                            ReleventSchemes: ThisItem.ReleventSchemes,
+                            ExcessHours: ThisItem.ExcessHours,
+                            Expenses: ThisItem.Expenses,
+                            PAFNumber: ThisItem.PAFNumber,
+                            SalaryBand: ThisItem.SalaryBand,
+                            LastEditor: ThisItem.LastEditor,
+                            EditComment: ThisItem.EditComment,
+                            Rej_calc: ThisItem.Rej_calc,
+                            ChoosenToExport: true
+                            });
+                    OnSelect: |-
+                        =Patch(colPeopleToExport, ThisItem, {ChoosenToExport:true})
+                    OnUncheck: =Remove(colPeopleToExport, LookUp(colPeopleToExport, ID2 = ThisItem.ID2))
+                    Text: =
+                    Width: =34
+                    X: =340
+                    Y: =27
+                    ZIndex: =6
+
+            shpFiltersBackground_7 As rectangle:
+                BorderColor: =RGBA(0, 0, 0, 0)
+                Fill: =ColorValue(ColorLightBlue)
+                Height: =652
+                Width: =233
+                Y: =42
+                ZIndex: =8
+
+            lblAllFilters_7 As label:
+                Color: =ColorValue(ColorWhite)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Bold
+                Height: =29
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: ="Filters"
+                Width: =153
+                X: =21
+                Y: =47
+                ZIndex: =9
+
+            rdoProject_7 As radio:
+                Color: =ColorValue(ColorWhite)
+                Default: =Blank()
+                Font: =Font.Lato
+                Height: =94
+                HoverColor: =ColorValue(ColorGray)
+                Items: |-
+                    =ForAll(Distinct(
+                        If(
+                            Text(First(gblUserHomeOrg.Result).Result) <> "All",
+                            Filter(
+                                projectFilter,
+                                HomeOrganisation = Text(First(gblUserHomeOrg.Result).Result)
+                            ),
+                            projectFilter
+                        ),
+                        Project
+                    ), {Result: ThisRecord.Value})
+                PaddingBottom: =0
+                PaddingTop: =0
+                RadioBorderColor: =RGBA(116, 116, 116, 1)
+                RadioSize: =18
+                Size: =8
+                Width: =217
+                Y: =109
+                ZIndex: =10
+
+            rdoHomeOrganisation_7 As radio:
+                Color: =ColorValue(ColorWhite)
+                Default: ="None"
+                Font: =Font.Lato
+                Height: =66
+                HoverColor: =ColorValue(ColorGray)
+                Items: |-
+                    =ForAll(Distinct(
+                        If(
+                            Text(First(gblUserHomeOrg.Result).Result) <> "All",
+                            Filter(
+                                SMA_AT5,
+                                HomeOrganisation = Text(First(gblUserHomeOrg.Result).Result)
+                            ),
+                            SMA_AT5
+                        ),
+                        HomeOrganisation
+                    ), {Result: ThisRecord.Value})
+                PaddingBottom: =0
+                PaddingTop: =0
+                RadioBorderColor: =RGBA(116, 116, 116, 1)
+                RadioSize: =18
+                Size: =8
+                Width: =217
+                X: =1
+                Y: =249
+                ZIndex: =11
+
+            rdoGroup_7 As radio:
+                Color: =ColorValue(ColorWhite)
+                Default: =Blank()
+                Font: =Font.Lato
+                Height: =242
+                HoverColor: =ColorValue(ColorGray)
+                Items: |-
+                    =ForAll(Distinct(
+                        If(
+                            Text(First(gblUserHomeOrg.Result).Result) <> "All",
+                            Filter(
+                                disciplineFilter,
+                                HomeOrganisation = Text(First(gblUserHomeOrg.Result).Result),
+                                Discipline <> "ALT"
+                            ),
+                            disciplineFilter
+                        ),
+                        Discipline
+                    ), {Result: ThisRecord.Value})
+                PaddingBottom: =0
+                PaddingTop: =0
+                RadioBorderColor: =RGBA(116, 116, 116, 1)
+                RadioSize: =18
+                Size: =8
+                Width: =217
+                Y: =368
+                ZIndex: =12
+
+            txtNameSearch_4 As text:
+                BorderColor: =ColorValue(ColorLightBlue)
+                BorderThickness: =1
+                Default: =""
+                Height: =47
+                HintText: ="Search by requestor Name"
+                HoverBorderColor: =ColorValue(ColorLightBlue)
+                HoverFill: =ColorValue(ColorGray)
+                Italic: =true
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Width: =344
+                X: =233
+                Y: =42
+                ZIndex: =13
+
+            btnClearprojects_7 As button:
+                BorderColor: =ColorValue(ColorWhite)
+                BorderThickness: =1
+                Color: =ColorValue(ColorWhite)
+                Fill: =RGBA(0, 0, 0, 0)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Lighter
+                Height: =22
+                HoverColor: =ColorValue(ColorGray)
+                HoverFill: =
+                OnSelect: |-
+                    =// Reseting project radio on click
+                    
+                    Reset(rdoProject_7)
+                PaddingBottom: =1
+                PaddingLeft: =1
+                PaddingRight: =1
+                PaddingTop: =1
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Text: ="Clear"
+                Width: =54
+                X: =166
+                Y: =76
+                ZIndex: =14
+
+            lblProjects_7 As label:
+                Color: =ColorValue(ColorWhite)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Bold
+                Height: =29
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: ="Projects"
+                Underline: =true
+                Width: =153
+                X: =21
+                Y: =71
+                ZIndex: =15
+
+            lblHome_7 As label:
+                Color: =ColorValue(ColorWhite)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Bold
+                Height: =29
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: ="Home Organisation"
+                Underline: =true
+                Width: =153
+                X: =20
+                Y: =214
+                ZIndex: =16
+
+            lblDiscipline_7 As label:
+                Color: =ColorValue(ColorWhite)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Bold
+                Height: =29
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: ="Discipline"
+                Underline: =true
+                Width: =153
+                X: =20
+                Y: =327
+                ZIndex: =17
+
+            btnClearTextSearch_7 As button:
+                BorderColor: =Color.White
+                BorderThickness: =0
+                Color: =ColorValue(ColorWhite)
+                Fill: =ColorValue(ColorGray)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Lighter
+                Height: =47
+                HoverColor: =ColorValue(ColorWhite)
+                HoverFill: =ColorValue(ColorLightBlue)
+                OnSelect: |-
+                    =// Reseting HomeOrganization radio on click
+                    
+                    Reset(txtNameSearch_4)
+                PaddingBottom: =1
+                PaddingLeft: =1
+                PaddingRight: =1
+                PaddingTop: =1
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Text: ="Clear"
+                Width: =54
+                X: =577
+                Y: =42
+                ZIndex: =18
+
+            btnClearHome_7 As button:
+                BorderColor: =ColorValue(ColorWhite)
+                BorderThickness: =1
+                Color: =ColorValue(ColorWhite)
+                Fill: =RGBA(0, 0, 0, 0)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Lighter
+                Height: =22
+                HoverColor: =ColorValue(ColorGray)
+                HoverFill: =
+                OnSelect: |-
+                    =// Reseting project radio on click
+                    
+                    Reset(rdoHomeOrganisation_7)
+                PaddingBottom: =1
+                PaddingLeft: =1
+                PaddingRight: =1
+                PaddingTop: =1
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Text: ="Clear"
+                Width: =54
+                X: =162
+                Y: =217
+                ZIndex: =19
+
+            btnClearDiscipline_7 As button:
+                BorderColor: =ColorValue(ColorWhite)
+                BorderThickness: =1
+                Color: =ColorValue(ColorWhite)
+                Fill: =RGBA(0, 0, 0, 0)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Lighter
+                Height: =22
+                HoverColor: =ColorValue(ColorGray)
+                HoverFill: =
+                OnSelect: |-
+                    =// Reseting project radio on click
+                    
+                    Reset(rdoGroup_7)
+                PaddingBottom: =1
+                PaddingLeft: =1
+                PaddingRight: =1
+                PaddingTop: =1
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Text: ="Clear"
+                Width: =54
+                X: =165
+                Y: =331
+                ZIndex: =20
+
+            btnClearAllfilters_7 As button:
+                BorderColor: =ColorValue(ColorWhite)
+                BorderThickness: =1
+                Color: =ColorValue(ColorWhite)
+                Fill: =RGBA(0, 0, 0, 0)
+                Font: =Font.Lato
+                FontWeight: =FontWeight.Lighter
+                Height: =22
+                HoverColor: =ColorValue(ColorGray)
+                HoverFill: =
+                OnSelect: |-
+                    =// Reseting project radio on click
+                    
+                    Reset(rdoProject_7);
+                    Reset(rdoHomeOrganisation_7);
+                    Reset(rdoGroup_7)
+                PaddingBottom: =1
+                PaddingLeft: =1
+                PaddingRight: =1
+                PaddingTop: =1
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Text: ="Clear all filters"
+                Width: =196
+                X: =21
+                Y: =634
+                ZIndex: =21
+
+    tmEmailNotification As timer:
+        Duration: =3000
+        OnTimerEnd: |
+            =Set(locEmailNotVis, false);
+            Set(locEmailTimer, false)
+        OnTimerStart: |-
+            =Set(locEmailNotVis, true);
+            Set(locEmailPopUpVis, false);
+        Reset: =true
+        Start: =locEmailTimer
+        Visible: =false
+        X: =1102
+        Y: =494
+        ZIndex: =57
+
+    lblEmailSent As label:
+        Color: =amColorYes
+        Height: =42
+        Text: ="Email has been send"
+        Visible: =locEmailNotVis
+        Width: =186
+        X: =1096
+        Y: =451
+        ZIndex: =58
+

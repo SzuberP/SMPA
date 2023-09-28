@@ -1,0 +1,14 @@
+{
+  "QualifiedValues": [
+    {
+      "Kind": "default.cds_organization_forms",
+      "Namespace": "Organizations (Forms)",
+      "Values": {}
+    },
+    {
+      "Kind": "default.cds_organization_forms",
+      "Namespace": "Organizations (Formularze)",
+      "Values": {}
+    }
+  ]
+}

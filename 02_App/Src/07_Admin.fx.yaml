@@ -1,0 +1,1500 @@
+"'07_Admin' As screen":
+    OnVisible: |-
+        =Set(AddNewApprover, false);
+        
+        Collect(col_people, {HtmlText: txtMessageBody.HtmlText});
+        Set(SelectedAdmin_ID, Blank());
+        Set(SelectedAdmin_Name, Blank());
+        Set(SelectedAdmin_Group, Blank());
+        Set(SelectedAdmin_GroupID, Blank());
+        Set(SelectedAdmin_Homeorganisation, Blank());
+        Set(SelectedAdmin_Project, Blank());
+        
+        Set(DbLevel1, false);
+        Set(DbLevel2, false);
+        Set(DbLevel7, false);
+        Set(DbLevel8, false);
+        Set(DbLevel9, false);
+        Set(DbLevelNH, false);
+        
+        Reset(level1);
+        Reset(level2);
+        Reset(levelNH);
+        Reset(level7);
+        Reset(level8);
+        Reset(level9);
+        
+        UpdateContext({SavedInfoVisible:false});
+        
+        Set(EnableEdit, false);
+        Set(EditAccess,true);
+        Set(EditInfo, false);
+        
+        Set(DisplayPopup, false)
+
+    timerSaved As timer:
+        Duration: =2000
+        OnTimerEnd: |-
+            =UpdateContext({SavedInfoVisible:false})
+        OnTimerStart: |-
+            =UpdateContext({SavedInfoVisible:true})
+        Start: =StartTimer
+        Visible: =false
+        X: =493
+        Y: =697
+        ZIndex: =3
+
+    grpHeaderMain_2 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =20
+        ZIndex: =12
+
+        shpHeaderBackground_2 As rectangle:
+            Fill: =ColorValue(ColorDarkBlue)
+            Height: =50
+            Tooltip: =
+            Width: =1366
+            ZIndex: =4
+
+        btnHome_2 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =Navigate('01_Intro', ScreenTransition.Fade); Set(SelectedPerson_Name, "");
+                Set(locApprovalText, ""); Set(locMassiveApproval, false); Reset(toggleMassiveApproval)
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Home"
+            Tooltip: =
+            Width: =86
+            X: =139
+            Y: =5
+            ZIndex: =5
+
+        lblSMP_5 As label:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            Height: =30
+            HoverBorderColor: =lblSMP_5.BorderColor
+            HoverColor: =lblSMP_5.Color
+            HoverFill: =lblSMP_5.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =lblSMP_5.BorderColor
+            PressedColor: =lblSMP_5.Color
+            PressedFill: =lblSMP_5.Fill
+            Size: =12
+            Text: ="SMP "
+            Tooltip: =
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =36
+            X: =18
+            ZIndex: =6
+
+        lblAccess_5 As label:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            Height: =26
+            HoverBorderColor: =lblAccess_5.BorderColor
+            HoverColor: =lblAccess_5.Color
+            HoverFill: =lblAccess_5.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =lblAccess_5.BorderColor
+            PressedColor: =lblAccess_5.Color
+            PressedFill: =lblAccess_5.Fill
+            Size: =8
+            Text: ="SMP Alliance Portal"
+            Tooltip: =
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =112
+            X: =23
+            Y: =20
+            ZIndex: =7
+
+        lblAlliance_5 As label:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Height: =29
+            HoverBorderColor: =lblAlliance_5.BorderColor
+            HoverColor: =lblAlliance_5.Color
+            HoverFill: =lblAlliance_5.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =lblAlliance_5.BorderColor
+            PressedColor: =lblAlliance_5.Color
+            PressedFill: =lblAlliance_5.Fill
+            Size: =12
+            Text: ="Alliance"
+            Tooltip: =
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =69
+            X: =54
+            ZIndex: =8
+
+        btnHelp_2 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: =Navigate('05_Help', ScreenTransition.Fade); Set(SelectedPerson_Name, ""); Set(locMassiveApproval, false); Reset(toggleMassiveApproval)
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Help"
+            Tooltip: =
+            Width: =86
+            X: =225
+            Y: =5
+            ZIndex: =9
+
+        btnContact_2 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: =Navigate('06_Contact', ScreenTransition.Fade); Set(SelectedPerson_Name, ""); Set(locMassiveApproval, false); Reset(toggleMassiveApproval)
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Contact"
+            Tooltip: =
+            Width: =86
+            X: =316
+            Y: =5
+            ZIndex: =10
+
+        btnAdmin_2 As button:
+            Color: =ColorValue(ColorWhite)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorValue(ColorGray)
+            HoverFill: =
+            OnSelect: |-
+                =If(gblUserGroupId_A = 8, Navigate('07_Admin', ScreenTransition.Fade)); 
+                Set(SelectedPerson_Name, ""); Set(locMassiveApproval, false); Reset(toggleMassiveApproval)
+            PressedColor: =ColorValue(ColorLightBlue)
+            PressedFill: =
+            Size: =12
+            Text: ="Admin"
+            Tooltip: =
+            Width: =86
+            X: =420
+            Y: =5
+            ZIndex: =11
+
+        shpHeader_5 As rectangle:
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =40
+            Tooltip: =
+            Width: =1
+            X: =130
+            Y: =5
+            ZIndex: =12
+
+        txtUserEmail_2 As label:
+            Align: =Align.Right
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =ColorValue(ColorWhite)
+            DisabledColor: =ColorFade(RGBA(47, 41, 43, 1), 70%)
+            Font: =Font.Lato
+            Height: =48
+            HoverBorderColor: =txtUserEmail_2.BorderColor
+            HoverColor: =txtUserEmail_2.Color
+            HoverFill: =txtUserEmail_2.Fill
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PressedBorderColor: =txtUserEmail_2.BorderColor
+            PressedColor: =txtUserEmail_2.Color
+            PressedFill: =txtUserEmail_2.Fill
+            Size: =8
+            Text: |-
+                ="Logged as: " & User().Email
+            Tooltip: =
+            Visible: =If(!FormPattern.Details, true,false)
+            Width: =337
+            X: =951
+            ZIndex: =19
+
+        imgUser_2 As image:
+            Height: =37
+            Image: =User().Image
+            Tooltip: =
+            Width: =47
+            X: =1302
+            Y: =8
+            ZIndex: =20
+
+    grpRightPane As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =36
+
+        shpAcessBackground As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =ColorValue(ColorLightBlue)
+            Height: =718
+            Width: =326
+            X: =1040
+            Y: =50
+            ZIndex: =1
+
+        btnUpdate As button:
+            BorderColor: =ColorValue(ColorWhite)
+            DisplayMode: |-
+                =If(
+                    (DbLevel1<>level1.Value || DbLevel2<>level2.Value || DbLevelNH<>levelNH.Value || DbLevel7<>level7.Value || DbLevel8<>level8.Value || DbLevel9<>level9.Value) && !IsBlank(DataCardValue21),
+                    DisplayMode.Edit , DisplayMode.Disabled)
+            Fill: =ColorValue(ColorLightBlue)
+            Height: =39
+            HoverFill: =ColorFade(Self.Fill, -20%)
+            OnSelect: |-
+                =Set(AddNewApprover, false);
+                
+                Set(NewRecord,
+                    {   
+                        Email:DataCardValue21.Text,
+                        Home_organisation: dpdHomeOrg.SelectedText.Value,
+                        Project: dpdProject.SelectedText.Value,
+                        Name: DataCardValue26.Text
+                    }
+                );
+                
+                
+                If(level1.Value=false && level2.Value=false && level7.Value=false && level8.Value=false && level9.Value=false && levelNH.Value=false, Set(locDeleteAll, true), Set(locDeleteAll, false));
+                
+                
+                If(locDeleteAll=true, UpdateContext({DisplayPopup:true}));
+                If(locDeleteAll=true, Set(DisplayPopup,true));
+                
+                
+                If(locDeleteAll=false,
+                    If(
+                        (EditAccess=true && DbLevel1 <> level1.Value && level1.Value=true),
+                        Patch(
+                            People, 
+                            Defaults(People), 
+                            Patch(NewRecord, {GroupID: 1, Group: "PM/Workstream"})
+                            ), 
+                        If(
+                            DbLevel1<>level1.Value && level1.Value = false,
+                            RemoveIf(People, Email=DataCardValue21.Text && Project=dpdProject.SelectedText.Value && Home_organisation=dpdHomeOrg.SelectedText.Value && GroupID=1)
+                        )
+                    )
+                );
+                
+                If(locDeleteAll=false,
+                    If(
+                        (EditAccess=true && DbLevel2 <> level2.Value && level2.Value=true),
+                        Patch(
+                            People, 
+                            Defaults(People), 
+                            Patch(NewRecord, {GroupID: 2, Group: "Director/Manager"})
+                            ), 
+                        If(
+                            DbLevel2<>level2.Value && level2.Value = false,
+                            RemoveIf(People, Email=DataCardValue21.Text && Project=dpdProject.SelectedText.Value && Home_organisation=dpdHomeOrg.SelectedText.Value && GroupID=2)
+                        )
+                    )
+                );
+                
+                If(locDeleteAll=false,
+                    If(
+                        (EditAccess=true && DbLevelNH <> levelNH.Value && levelNH.Value=true),
+                        Patch(
+                            People, 
+                            Defaults(People), 
+                            Patch(NewRecord, {GroupID: 3, Group: "National Highways"})
+                            ), 
+                        If(
+                            DbLevelNH<>levelNH.Value && levelNH.Value = false,
+                            RemoveIf(People, Email=DataCardValue21.Text && Project=dpdProject.SelectedText.Value && Home_organisation=dpdHomeOrg.SelectedText.Value && GroupID=3)
+                        )
+                    )
+                );
+                
+                If(locDeleteAll=false,
+                    If(
+                        (EditAccess=true && DbLevel7 <> level7.Value && level7.Value=true),
+                        Patch(
+                            People, 
+                            Defaults(People), 
+                            Patch(NewRecord, {GroupID: 7, Group: "Project Controls"})
+                            ), 
+                        If(
+                            DbLevel7<>level7.Value && level7.Value = false,
+                            RemoveIf(People, Email=DataCardValue21.Text && Project=dpdProject.SelectedText.Value && Home_organisation=dpdHomeOrg.SelectedText.Value && GroupID=7)
+                        )
+                    )
+                );
+                
+                If(locDeleteAll=false,
+                    If(
+                        (EditAccess=true && DbLevel8 <> level8.Value && level8.Value=true),
+                        Patch(
+                            People, 
+                            Defaults(People), 
+                            Patch(NewRecord, {GroupID: 8, Group: "Project Accountant"})
+                            ), 
+                        If(
+                            DbLevel8<>level8.Value && level8.Value = false,
+                            RemoveIf(People, Email=DataCardValue21.Text && Project=dpdProject.SelectedText.Value && Home_organisation=dpdHomeOrg.SelectedText.Value && GroupID=8)
+                        )
+                    )
+                );
+                
+                If(locDeleteAll=false,
+                    If(
+                        (EditAccess=true && DbLevel9 <> level9.Value && level9.Value=true),
+                        Patch(
+                            People, 
+                            Defaults(People), 
+                            Patch(NewRecord, {GroupID: 9, Group: "Project Wise"})
+                            ), 
+                        If(
+                            DbLevel9<>level9.Value && level9.Value = false,
+                            RemoveIf(People, Email=DataCardValue21.Text && Project=dpdProject.SelectedText.Value && Home_organisation=dpdHomeOrg.SelectedText.Value && GroupID=9)
+                        )
+                    )
+                );
+                
+                
+                // Refresh collection
+                Refresh(People);
+                Set(SelectedAdmin_Email, DataCardValue21.Text);
+                Set(SelectedAdmin_Name, DataCardValue26.Text);
+                Set(SelectedAdmin_Homeorganisation, dpdHomeOrg.SelectedText.Value);
+                Set(SelectedAdmin_Project, dpdProject.SelectedText.Value);
+                
+                SelectedAdmin_Email;
+                
+                // Display info that saved 
+                ClearCollect(SelectedAdmin, Filter(People, Email=SelectedAdmin_ID && (GroupID=1 || GroupID=2 || GroupID=3 || GroupID=7 || GroupID=8|| GroupID=9)));
+                If(locDeleteAll=false, UpdateContext({StartTimer: false})); 
+                If(locDeleteAll=false, Reset(timerSaved));
+                If(locDeleteAll=false, UpdateContext({StartTimer:true}));
+                
+                
+                //Update database levels info
+                If(CountRows(Filter(SelectedAdmin,GroupID =1)) > 0, Set(DbLevel1, true), Set(DbLevel1, false));
+                If(CountRows(Filter(SelectedAdmin,GroupID =2)) > 0, Set(DbLevel2, true), Set(DbLevel2, false));
+                If(CountRows(Filter(SelectedAdmin,GroupID =3)) > 0, Set(DbLevelNH, true), Set(DbLevelNH, false));
+                If(CountRows(Filter(SelectedAdmin,GroupID =7)) > 0, Set(DbLevel7, true), Set(DbLevel7, false));
+                If(CountRows(Filter(SelectedAdmin,GroupID =8)) > 0, Set(DbLevel8, true), Set(DbLevel8, false));
+                If(CountRows(Filter(SelectedAdmin,GroupID =9)) > 0, Set(DbLevel9, true), Set(DbLevel9, false));
+                
+                ClearCollect(AdminGroups, {});
+                If(level1.Value=true, Collect(AdminGroups, {Name: "1 - PM/Workstream Lead; "}));
+                If(level2.Value=true, Collect(AdminGroups, {Name: "2 - Director/Manager; "}));
+                If(levelNH.Value=true, Collect(AdminGroups, {Name: "3 - National Highways; "}));
+                If(level7.Value=true, Collect(AdminGroups, {Name: "7 - Project Controls; "}));
+                If(level8.Value=true, Collect(AdminGroups, {Name: "8 - Project Accountant; "}));
+                If(level9.Value=true, Collect(AdminGroups, {Name: "9 - Project Wise; "}));
+                
+                Set(SelectedAdmin_GroupInfo, Concat(AdminGroups, Name, ""));
+                
+                flwAddUser.Run(SelectedAdmin_Email, SelectedAdmin_Name, SelectedAdmin_Project, SelectedAdmin_Homeorganisation, SelectedAdmin_GroupInfo);
+                
+                ResetForm(frmEditApprover_1);
+            PressedColor: =
+            RadiusBottomLeft: =
+            RadiusBottomRight: =
+            RadiusTopLeft: =
+            RadiusTopRight: =
+            Text: =If(frmEditApprover_1.Mode=FormMode.New, "Add", "Update")
+            Visible: =EditAccess
+            X: =1119
+            Y: =600
+            ZIndex: =2
+
+        level9 As checkbox:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            CheckboxBorderColor: =RGBA(33, 33, 33, 1)
+            CheckboxSize: =30
+            Color: =ColorValue(ColorWhite)
+            Default: =DbLevel9
+            DisplayMode: =If(EditAccess=true, DisplayMode.Edit, DisplayMode.View)
+            Height: =38
+            HoverColor: =ColorValue(ColorDarkBlue)
+            Reset: =
+            Size: =10
+            Text: ="Project Wise"
+            Width: =179
+            X: =1105
+            Y: =355
+            ZIndex: =31
+
+        level8 As checkbox:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            CheckboxBorderColor: =RGBA(33, 33, 33, 1)
+            CheckboxSize: =30
+            Color: =ColorValue(ColorWhite)
+            Default: =DbLevel8
+            DisplayMode: =If(EditAccess=true, DisplayMode.Edit, DisplayMode.View)
+            Height: =38
+            HoverColor: =ColorValue(ColorDarkBlue)
+            Reset: =
+            Size: =10
+            Text: ="Project Accountant"
+            Width: =179
+            X: =1105
+            Y: =315
+            ZIndex: =32
+
+        level7 As checkbox:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            CheckboxBorderColor: =RGBA(33, 33, 33, 1)
+            CheckboxSize: =30
+            Color: =ColorValue(ColorWhite)
+            Default: =DbLevel7
+            DisplayMode: =If(EditAccess=true, DisplayMode.Edit, DisplayMode.View)
+            Height: =38
+            HoverColor: =ColorValue(ColorDarkBlue)
+            Size: =10
+            Text: ="Project Controller"
+            Width: =179
+            X: =1105
+            Y: =276
+            ZIndex: =33
+
+        level2 As checkbox:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            CheckboxBorderColor: =RGBA(33, 33, 33, 1)
+            CheckboxSize: =30
+            Color: =ColorValue(ColorWhite)
+            Default: =DbLevel2
+            DisplayMode: =If(EditAccess=true, DisplayMode.Edit, DisplayMode.View)
+            Height: =38
+            HoverColor: =ColorValue(ColorDarkBlue)
+            Size: =10
+            Text: ="Alliance Director"
+            Width: =179
+            X: =1105
+            Y: =238
+            ZIndex: =34
+
+        level1 As checkbox:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            CheckboxBorderColor: =RGBA(56, 56, 56, 1)
+            CheckboxSize: =30
+            Color: =ColorValue(ColorWhite)
+            Default: =DbLevel1
+            DisplayMode: =If(EditAccess=true, DisplayMode.Edit, DisplayMode.View)
+            Height: =38
+            HoverColor: =ColorValue(ColorDarkBlue)
+            OnCheck: =Set(NewLevel1, true)
+            OnUncheck: =Set(NewLevel1, false)
+            Reset: =
+            Size: =10
+            Text: ="Budgetholder"
+            Width: =188
+            X: =1105
+            Y: =196
+            ZIndex: =35
+
+        Levels As label:
+            Align: =Align.Center
+            Color: =ColorValue(ColorWhite)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Semibold
+            Height: =39
+            Text: ="Approver access levels"
+            Width: =200
+            X: =1093
+            Y: =134
+            ZIndex: =36
+
+    pupApproveChange As groupContainer:
+        BorderColor: =ColorValue(ColorDarkBlue)
+        BorderThickness: =0.5
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =237
+        Visible: =If(DisplayPopup, true, false)
+        Width: =455
+        X: =520
+        Y: =290
+        ZIndex: =37
+
+        shpGreyOut_2 As rectangle:
+            Fill: =RGBA( 248, 248, 255, 0.5)
+            Height: =237
+            Visible: =locGreyOutVis
+            Width: =455
+            ZIndex: =1
+
+        btnYes As button:
+            BorderColor: =ColorValue(ColorWhite)
+            Fill: =ColorValue(ColorLightBlue)
+            OnSelect: |-
+                =// Check if level has been changed and if yes remove row in database
+                If(DbLevel1<>level1.Value && level1.Value=false,RemoveIf(People, Email=DataCardValue21.Text && GroupID=1));
+                If(DbLevel2<>level2.Value && level2.Value=false,RemoveIf(People, Email=DataCardValue21.Text && GroupID=2));
+                If(DbLevel7<>level7.Value && level7.Value=false,RemoveIf(People, Email=DataCardValue21.Text && GroupID=7));
+                If(DbLevel8<>level8.Value && level8.Value=false,RemoveIf(People, Email=DataCardValue21.Text && GroupID=8));
+                If(DbLevel9<>level9.Value && level9.Value=false,RemoveIf(People, Email=DataCardValue21.Text && GroupID=9));
+                
+                Set(DisplayPopup, false);
+                Refresh(People);
+                
+                Set(SelectedAdmin_ID, Blank());
+                Set(SelectedAdmin_Name, Blank());
+                Set(SelectedAdmin_Group, Blank());
+                Set(SelectedAdmin_GroupID, Blank());
+                Set(SelectedAdmin_Homeorganisation, Blank());
+                Set(SelectedAdmin_Project, Blank());
+                
+                
+                // Show info 
+                UpdateContext({StartTimer: false}); 
+                Reset(timerSaved);
+                UpdateContext({StartTimer:true});
+                
+                //flwDeleteUser.Run(SelectedAdmin_ID);
+            RadiusBottomLeft: =
+            RadiusBottomRight: =
+            RadiusTopLeft: =
+            RadiusTopRight: =
+            Text: ="Yes"
+            Width: =112
+            X: =88
+            Y: =140
+            ZIndex: =2
+
+        btnNo As button:
+            BorderColor: =ColorValue(ColorWhite)
+            Fill: =ColorValue(ColorLightBlue)
+            OnSelect: |-
+                =Set(DisplayPopup, false);
+                Reset(level1);
+                Reset(level2);
+                Reset(level7);
+                Reset(level8);
+                Reset(level9);
+            RadiusBottomLeft: =
+            RadiusBottomRight: =
+            RadiusTopLeft: =
+            RadiusTopRight: =
+            Text: ="No"
+            Width: =112
+            X: =260
+            Y: =140
+            ZIndex: =3
+
+        lbl As label:
+            Color: =RGBA(0, 13, 75, 1)
+            FontWeight: =FontWeight.Semibold
+            Size: =14
+            Text: ="User will be deleted. Are you sure?"
+            Width: =326
+            X: =65
+            Y: =55
+            ZIndex: =4
+
+    grpChoseUser As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =37
+
+        "Gallery_People_3 As gallery.'BrowseLayout_Vertical_ThreeTextVariant_ver4.0'":
+            BorderColor: =ColorValue(ColorLightBlue)
+            Height: =590
+            Items: |-
+                =// Series of Ifs and filters to apply settings from filtters and search box
+                // Starting with if to val if search field is empty
+                
+                /*If(!IsBlank(Search_TextInput_Admin_1.Text),
+                    Search(
+                        ForAll(ForAll(Distinct(People,Email), {Result: ThisRecord.Value}),First(Filter(People,Email=Result))),
+                        Search_TextInput_Admin_1.Text, "Email"),
+                ForAll(ForAll(Distinct(Filter(People,(GroupID=1 || GroupID=2 || GroupID=7 || GroupID=8 || GroupID=9 )),Email), {Result: ThisRecord.Value}),First(Filter(People,Email=Result)))
+                )*/
+                
+                Search(GroupBy(People, "Name" , "Email", "Home_organisation", "Project", "GroupID"), Search_TextInput_Admin_1.Text, "Name")
+            Layout: =Layout.Vertical
+            OnSelect: =
+            TemplatePadding: =0
+            TemplateSize: =93
+            Width: =459
+            Y: =177
+            ZIndex: =21
+
+            Title2_7 As label:
+                Color: =ColorValue(ColorDarkBlue)
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Name
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.TemplateWidth - 104
+                X: =32
+                Y: =16
+                ZIndex: =1
+
+            Subtitle2_6 As label:
+                Color: =ColorValue(ColorBlack)
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =9
+                Text: =ThisItem.Email
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.TemplateWidth - 104
+                X: =32
+                Y: =Title2_7.Y + Title2_7.Height + 2
+                ZIndex: =2
+
+            Body2_6 As label:
+                Color: =ColorValue(ColorBlack)
+                Height: =16
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: |-
+                    ="Project: " & ThisItem.Project
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.TemplateWidth - 104
+                X: =32
+                Y: =57
+                ZIndex: =3
+
+            NextArrow2_6 As icon.ChevronRight:
+                AccessibleLabel: =Self.Tooltip
+                Color: =ColorValue(ColorLightBlue)
+                Height: =60
+                HoverColor: =ColorValue(ColorGray)
+                Icon: =Icon.ChevronRight
+                OnSelect: |+
+                    =Set(AddNewApprover, false);
+                    Set(EditInfo, false);
+                    
+                    //Reset unsaved changes
+                    UpdateContext({SavedInfoVisible:false});
+                    Reset(level1);
+                    Reset(level2);
+                    Reset(levelNH);
+                    Reset(level7);
+                    Reset(level8);
+                    Reset(level9);
+                    
+                    //SelectedAdmin_GroupInfo
+                    
+                    // Set variable for gallery look up
+                    Set(SelectedAdmin_ID, ThisItem.Email);
+                    Set(SelectedAdmin_Name, ThisItem.Name);
+                    Set(SelectedAdmin_Homeorganisation, ThisItem.Home_organisation);
+                    Set(SelectedAdmin_Project, ThisItem.Project);
+                    
+                    //Set(SelectedAdmin_Group, ThisItem.Group);
+                    //Set(SelectedAdmin_GroupID, ThisItem.GroupID);
+                    
+                    
+                    //Check user levels
+                    
+                    // 23.05.2023
+                    //Set(SelectedAdmin_Level, ThisItem.GroupID);
+                    //ClearCollect(SelectedAdmin, Filter(People, Email=ThisItem.Email && (GroupID=1 || GroupID=2 || GroupID=3 || GroupID=7 || GroupID=8 || GroupID=9)));
+                    // NEW
+                    ClearCollect(SelectedAdmin, Filter(People, Email=ThisItem.Email && Project=ThisItem.Project && Home_organisation=ThisItem.Home_organisation));
+                    //ClearCollect(SelectedAdmin, Filter(People, Email="piskorz.bartlomiej@smpalliance.co.uk"));
+                    
+                    If(CountRows(Filter(SelectedAdmin,GroupID =1)) > 0, Set(DbLevel1, true), Set(DbLevel1, false));
+                    If(CountRows(Filter(SelectedAdmin,GroupID =2)) > 0, Set(DbLevel2, true), Set(DbLevel2, false));
+                    If(CountRows(Filter(SelectedAdmin,GroupID =3)) > 0, Set(DbLevelNH, true), Set(DbLevelNH, false));
+                    If(CountRows(Filter(SelectedAdmin,GroupID =7)) > 0, Set(DbLevel7, true), Set(DbLevel7, false));
+                    If(CountRows(Filter(SelectedAdmin,GroupID =8)) > 0, Set(DbLevel8, true), Set(DbLevel8, false));
+                    If(CountRows(Filter(SelectedAdmin,GroupID =9)) > 0, Set(DbLevel9, true), Set(DbLevel9, false));
+                    
+                    //EditForm(frmEditApprover)
+                    Set(EditAccess, true);
+                    Set(EditInfo, false);
+                    
+                    Set(EnableEdit, true);
+                    ViewForm(frmEditApprover_1);
+                    UpdateContext({SavedInfoVisible:false})
+                    
+                PaddingBottom: =10
+                PaddingLeft: =10
+                PaddingRight: =10
+                PaddingTop: =10
+                TabIndex: =0
+                Tooltip: ="View item details"
+                Width: =60
+                X: =Parent.TemplateWidth - Self.Width - 5
+                Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                ZIndex: =4
+
+            Separator2_7 As rectangle:
+                BorderColor: =RGBA(237, 237, 237, 1)
+                BorderThickness: =0.5
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =1
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =Parent.TemplateHeight - 1
+                ZIndex: =5
+
+            Body2_8 As label:
+                Color: =ColorValue(ColorBlack)
+                Height: =29
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: |-
+                    ="Home organisation: " & ThisItem.Home_organisation
+                VerticalAlign: =VerticalAlign.Top
+                Width: =Parent.TemplateWidth - 104
+                X: =32
+                Y: =73
+                ZIndex: =6
+
+        Search_TextInput_Admin_1 As text:
+            BorderColor: =ColorValue(ColorLightBlue)
+            BorderThickness: =1
+            Default: =""
+            Height: =41
+            HintText: ="Search Name"
+            HoverBorderColor: =ColorValue(ColorLightBlue)
+            HoverFill: =ColorValue(ColorGray)
+            Italic: =true
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Width: =409
+            Y: =137
+            ZIndex: =22
+
+        Button_ClearSearchText_3 As button:
+            BorderColor: =ColorValue(ColorLightBlue)
+            BorderThickness: =1
+            Color: =ColorValue(ColorWhite)
+            Fill: =ColorValue(ColorLightBlue)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Lighter
+            Height: =41
+            HoverColor: =ColorValue(ColorWhite)
+            HoverFill: =ColorValue(ColorGray)
+            OnSelect: |-
+                =// Reseting HomeOrganization radio on click
+                
+                Reset(Search_TextInput_Admin_1)
+            PaddingBottom: =1
+            PaddingLeft: =1
+            PaddingRight: =1
+            PaddingTop: =1
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Text: ="Clear"
+            Width: =50
+            X: =409
+            Y: =137
+            ZIndex: =23
+
+        Rectangle2_2 As rectangle:
+            BorderColor: =ColorValue(ColorLightBlue)
+            BorderThickness: =0.5
+            Fill: =ColorValue(ColorLightBlue)
+            Height: =87
+            Width: =460
+            Y: =50
+            ZIndex: =24
+
+        NextArrow2_7 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =ColorValue(ColorWhite)
+            Height: =60
+            HoverColor: =ColorValue(ColorGray)
+            Icon: =Icon.ChevronRight
+            OnSelect: |
+                =Set(AddNewApprover, true);
+                Set(EditInfo, false);
+                
+                
+                Set(SelectedAdmin_ID, Blank());
+                Set(SelectedAdmin_Name, Blank());
+                Set(SelectedAdmin_Group, Blank());
+                Set(SelectedAdmin_GroupID, Blank());
+                Set(SelectedAdmin_Homeorganisation, Blank());
+                Set(SelectedAdmin_Project, Blank());
+                
+                Set(DbLevel1, false);
+                Set(DbLevel2, false);
+                Set(DbLevel7, false);
+                Set(DbLevel8, false);
+                Set(DbLevel9, false);
+                Set(DbLevelNH, false);
+                
+                NewForm(frmEditApprover_1);
+                
+                Reset(level1);
+                Reset(level2);
+                Reset(level7);
+                Reset(level8);
+                Reset(level9);
+                Reset(levelNH);
+                
+                Set(EditAccess, true);
+                Set(EditInfo, false);
+                Set(EnableEdit, false);
+                UpdateContext({SavedInfoVisible:false})
+            PaddingBottom: =10
+            PaddingLeft: =10
+            PaddingRight: =10
+            PaddingTop: =10
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =61
+            X: =399
+            Y: =63
+            ZIndex: =25
+
+        Label8 As label:
+            Color: |
+                =ColorValue(ColorWhite)
+            FontWeight: =FontWeight.Semibold
+            Text: ="Add new approver"
+            Width: =178
+            X: =48
+            Y: =72
+            ZIndex: =26
+
+        shpCenterLineLeft_2 As rectangle:
+            Fill: =ColorValue(ColorLightBlue)
+            Height: =718
+            Width: =2
+            X: =459
+            Y: =50
+            ZIndex: =29
+
+    levelNH As checkbox:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        CheckboxBorderColor: =RGBA(33, 33, 33, 1)
+        CheckboxSize: =30
+        Color: =ColorValue(ColorWhite)
+        Default: =DbLevelNH
+        DisplayMode: =If(EditAccess=true, DisplayMode.Edit, DisplayMode.View)
+        Height: =38
+        HoverColor: =ColorValue(ColorDarkBlue)
+        Reset: =
+        Size: =10
+        Text: ="National Highways"
+        Width: =179
+        X: =1105
+        Y: =393
+        ZIndex: =39
+
+    grpCentralPane As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =39
+
+        frmEditApprover_1 As form:
+            AcceptsFocus: =false
+            DataSource: =People
+            DefaultMode: =If(EditInfo=true,FormMode.Edit,If(EditAccess=true, FormMode.View))
+            Height: =379
+            Item: |-
+                =//First(Filter(SelectedAdmin, Email=Gallery_People_3.Selected.Email && Project=Gallery_People_3.Selected.Project && Home_organisation=Gallery_People_3.Selected.Home_organisation))
+                First(SelectedAdmin)
+            NumberOfColumns: =1
+            Visible: =If(!IsBlank(SelectedAdmin_ID) Or AddNewApprover, true)
+            Width: =467
+            X: =517
+            Y: =173
+            ZIndex: =13
+
+            Name_DataCard2 As typedDataCard.textualEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="Name"
+                Default: =ThisItem.Name
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@People],DataSourceInfo.DisplayName,"Name")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =62
+                MaxLength: =DataSourceInfo([@People], DataSourceInfo.MaxLength, "Name")
+                Required: =false
+                Update: =DataCardValue26.Text
+                Width: =467
+                X: =0
+                Y: =0
+                ZIndex: =1
+
+                DataCardKey34 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(locDetailsKeyColor)
+                    Height: =34
+                    Size: =10
+                    Text: =Parent.DisplayName
+                    Width: =138
+                    Wrap: =false
+                    Y: =10 + (DataCardValue26.Height / 2) - (Self.Height / 2)
+                    ZIndex: =1
+
+                DataCardValue26 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    Default: =SelectedAdmin_Name
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    MaxLength: =Parent.MaxLength
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    Width: =323
+                    X: =138
+                    Y: =12
+                    ZIndex: =2
+
+                ErrorMessage42 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue26.Y + DataCardValue26.Height
+                    ZIndex: =3
+
+                StarVisible42 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey34.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey34.Y
+                    ZIndex: =4
+
+            View_name_DataCard2 As typedDataCard.textualEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="View_name"
+                Default: =ThisItem.View_name
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@People],DataSourceInfo.DisplayName,"View_name")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                MaxLength: =DataSourceInfo([@People], DataSourceInfo.MaxLength, "View_name")
+                Required: =false
+                Update: =DataCardValue29.Text
+                Visible: =false
+                Width: =467
+                X: =0
+                Y: =1
+                ZIndex: =1
+
+                DataCardKey38 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(locDetailsKeyColor)
+                    Height: =34
+                    Size: =10
+                    Text: =Parent.DisplayName
+                    Width: =139
+                    Wrap: =false
+                    Y: =10 + (DataCardValue29.Height / 2) - (Self.Height / 2)
+                    ZIndex: =1
+
+                DataCardValue29 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    Default: =SelectedAdmin_Name
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    MaxLength: =Parent.MaxLength
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    Width: =314
+                    X: =144
+                    Y: =12
+                    ZIndex: =2
+
+                ErrorMessage45 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue29.Y + DataCardValue29.Height
+                    ZIndex: =3
+
+                StarVisible45 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey38.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey38.Y
+                    ZIndex: =4
+
+            Email_DataCard2 As typedDataCard.textualEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="Email"
+                Default: =ThisItem.Email
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@People],DataSourceInfo.DisplayName,"Email")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                MaxLength: =DataSourceInfo([@People], DataSourceInfo.MaxLength, "Email")
+                Required: =false
+                Update: =DataCardValue21.Text
+                Width: =467
+                X: =0
+                Y: =2
+                ZIndex: =1
+
+                DataCardKey25 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(locDetailsKeyColor)
+                    Height: =34
+                    Size: =10
+                    Text: =Parent.DisplayName
+                    Width: =130
+                    Wrap: =false
+                    Y: =10 + (DataCardValue21.Height / 2) - (Self.Height / 2)
+                    ZIndex: =1
+
+                DataCardValue21 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    Default: =SelectedAdmin_ID
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    MaxLength: =Parent.MaxLength
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    X: =140
+                    Y: =12
+                    ZIndex: =2
+
+                ErrorMessage38 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue21.Y + DataCardValue21.Height
+                    ZIndex: =3
+
+                StarVisible38 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey25.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey25.Y
+                    ZIndex: =4
+
+            Category_DataCard2 As typedDataCard.numberEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="Category"
+                Default: =ThisItem.Category
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@People],DataSourceInfo.DisplayName,"Category")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                Required: =false
+                Update: =Value(DataCardValue20.Text)
+                Visible: =false
+                Width: =467
+                X: =0
+                Y: =3
+                ZIndex: =1
+
+                DataCardKey24 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(locDetailsKeyColor)
+                    Height: =34
+                    Size: =10
+                    Text: =Parent.DisplayName
+                    Width: =133
+                    Wrap: =false
+                    Y: =10 + (DataCardValue20.Height / 2) - (Self.Height / 2)
+                    ZIndex: =1
+
+                DataCardValue20 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    Default: =SelectedAdmin_Group
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    Format: =TextFormat.Number
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    Width: =313
+                    X: =144
+                    Y: =12
+                    ZIndex: =2
+
+                ErrorMessage23 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue20.Y + DataCardValue20.Height
+                    ZIndex: =3
+
+                StarVisible23 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey24.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey24.Y
+                    ZIndex: =4
+
+            Home_organisation_DataCard2 As typedDataCard.textualEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="Home_organisation"
+                Default: =ThisItem.Home_organisation
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@People],DataSourceInfo.DisplayName,"Home_organisation")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                MaxLength: =DataSourceInfo([@People], DataSourceInfo.MaxLength, "Home_organisation")
+                Required: =false
+                Update: =DataCardValue15.Text
+                Width: =467
+                X: =0
+                Y: =4
+                ZIndex: =1
+
+                DataCardKey22 As label:
+                    AutoHeight: =true
+                    Height: =28
+                    Size: =10
+                    Text: ="Home Organisation"
+                    Width: =132
+                    Wrap: =false
+                    Y: =10 + (DataCardValue15.Height / 2) - (Self.Height / 2)
+                    ZIndex: =1
+
+                DataCardValue15 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    Default: =SelectedAdmin_Homeorganisation
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    MaxLength: =Parent.MaxLength
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    Visible: =If(EditInfo Or AddNewApprover, false, true)
+                    Width: =311
+                    X: =140
+                    Y: =10
+                    ZIndex: =2
+
+                ErrorMessage18 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue15.Y + DataCardValue15.Height
+                    ZIndex: =3
+
+                StarVisible19 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey22.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey22.Y
+                    ZIndex: =4
+
+            Project_DataCard2 As typedDataCard.textualEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="Project"
+                Default: =ThisItem.Project
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@People],DataSourceInfo.DisplayName,"Project")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                MaxLength: =DataSourceInfo([@People], DataSourceInfo.MaxLength, "Project")
+                Required: =false
+                Update: =DataCardValue19.Text
+                Width: =467
+                X: =0
+                Y: =5
+                ZIndex: =1
+
+                DataCardKey23 As label:
+                    AutoHeight: =true
+                    Height: =34
+                    Size: =10
+                    Text: =Parent.DisplayName
+                    Width: =(Parent.Width - 60) * 0.4
+                    Wrap: =false
+                    Y: =10 + (DataCardValue19.Height / 2) - (Self.Height / 2)
+                    ZIndex: =1
+
+                DataCardValue19 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    Default: =SelectedAdmin_Project
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    MaxLength: =Parent.MaxLength
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    Visible: =If(EditInfo Or AddNewApprover, false, true)
+                    Width: =308
+                    X: =140
+                    Y: =10
+                    ZIndex: =2
+
+                ErrorMessage19 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue19.Y + DataCardValue19.Height
+                    ZIndex: =3
+
+                StarVisible21 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey23.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey23.Y
+                    ZIndex: =4
+
+        SavedInfo As label:
+            Align: =Align.Center
+            Color: =ColorValue(ColorRed)
+            FontWeight: =FontWeight.Bold
+            Size: =15
+            Text: ="Saved"
+            Visible: =SavedInfoVisible
+            Width: =160
+            X: =667
+            Y: =672
+            ZIndex: =14
+
+        btnEditAccess As button:
+            Fill: =If(EditAccess=false, RGBA(153, 153, 153, 1), ColorValue(ColorLightBlue))
+            Height: =37
+            OnSelect: |
+                =Set(EditInfo, false);
+                Set(EditAccess, true);
+            RadiusBottomLeft: =
+            RadiusBottomRight: =
+            RadiusTopLeft: =
+            RadiusTopRight: =
+            Size: =10
+            Text: ="Edit access level"
+            Visible: =EnableEdit
+            Width: =198
+            X: =549
+            Y: =86
+            ZIndex: =15
+
+        btnEditInfo As button:
+            Fill: =If(EditInfo=false, RGBA(153, 153, 153, 1), ColorValue(ColorLightBlue))
+            Height: =37
+            OnSelect: |-
+                =Set(EditAccess, false );
+                Set(EditInfo, true );
+            PressedColor: =Self.Color
+            PressedFill: =ColorValue(ColorLightBlue)
+            RadiusBottomLeft: =
+            RadiusBottomRight: =
+            RadiusTopLeft: =
+            RadiusTopRight: =
+            Size: =10
+            Text: |-
+                ="Edit user information
+                "
+            Visible: =EnableEdit
+            Width: =198
+            X: =747
+            Y: =86
+            ZIndex: =16
+
+        btnUpdate_1 As button:
+            DisplayMode: =If(frmEditApprover_1.Unsaved, DisplayMode.Edit, DisplayMode.Disabled)
+            Fill: =ColorValue(ColorLightBlue)
+            HoverFill: =ColorFade(Self.Fill, -20%)
+            OnSelect: |+
+                =Set(NewRecord,
+                    {   
+                        Email:DataCardValue21.Text,
+                        Home_organisation: dpdHomeOrg.SelectedText.Value,
+                        Project: dpdProject.SelectedText.Value, 
+                        Name:DataCardValue26.Text,
+                        View_name:DataCardValue29.Text
+                    }
+                );
+                
+                If(!IsBlank(DataCardValue21), UpdateIf(People, Email=SelectedAdmin_ID, NewRecord));
+                
+                
+                Set(SelectedAdmin_ID, DataCardValue21.Text);
+                Set(SelectedAdmin_Name, DataCardValue26.Text);
+                Set(SelectedAdmin_Homeorganisation, dpdHomeOrg.SelectedText.Value);
+                Set(SelectedAdmin_Project, dpdProject.SelectedText.Value);
+                Set(EditInfo, false);
+                Set(EditAccess, true);
+                
+                UpdateContext({StartTimer:false});
+                Reset(timerSaved);
+                UpdateContext({StartTimer:true});
+                
+                
+            RadiusBottomLeft: =
+            RadiusBottomRight: =
+            RadiusTopLeft: =
+            RadiusTopRight: =
+            Text: ="Save"
+            Visible: =EditInfo
+            X: =667
+            Y: =600
+            ZIndex: =17
+
+        Label9 As label:
+            Color: =RGBA(168, 0, 0, 1)
+            Size: =9
+            Text: ="Approver access level cannot be modified while editing user information"
+            Visible: =EditInfo
+            Width: =421
+            X: =537
+            Y: =121
+            ZIndex: =18
+
+        dpdHomeOrg As dropdown:
+            Default: =SelectedAdmin_Homeorganisation
+            Items: |
+                =["Balfour Beatty",
+                "BMJV",
+                "Costain",
+                "Fluor",
+                "National Highways",
+                "Jacobs",
+                "WSP", "All"]
+            Size: =10
+            Visible: =EditInfo Or AddNewApprover
+            Width: =322
+            X: =653
+            Y: =313
+            ZIndex: =27
+
+        dpdProject As dropdown:
+            Default: =SelectedAdmin_Project
+            Items: =ProjectList
+            Size: =10
+            Visible: =EditInfo Or AddNewApprover
+            Width: =322
+            X: =653
+            Y: =371
+            ZIndex: =28
+
