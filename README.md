@@ -1,4 +1,4 @@
-# SMPA
+# SMPA Portal Application 
 This is repo with documentation for SMPA Portal Appliation.
 
 ## App details 
@@ -8,17 +8,17 @@ Backgound operations are run using PowerAutomate Flows. The app  is hosted in Hi
 The main scope of the application is to automate the process of approving employess assigned to work in SMP Project.  
 
 ## App Structure
-In the app menu on the 01_Intro Screen user can choose between two standard operations, that based on users access, directs them to different screens:
+In the app menu on the [01_Intro](03_AppDoceumentation/01_Intro.md) Screen user can choose between two standard operations, that based on users access, directs them to different screens:
 * Approvals:
-    - Budgetholders -> 04_Approvals
-    - National Highways controlers -> 04_Approvals
-    - Managers -> 04_Approvals
+    - Budgetholders -> [04_Approvals](03_AppDoceumentation/04_Approvals.md)
+    - National Highways controlers -> [04_Approvals](03_AppDoceumentation/04_Approvals.md)
+    - Managers -> [04_Approvals](03_AppDoceumentation/04_Approvals.md)
     
 * Operations:
     - Project Controlers
-        - Confirm New PAFs -> 02_Main
-        - Edit Existing PAFs -> 03_PCExisting
-        - In-flight PAF applications - > 08_PcInFlight
+        - Confirm New PAFs -> [02_Main](03_AppDoceumentation/02_Main.md)
+        - Edit Existing PAFs -> [03_PCExisting](03_AppDoceumentation/03_PCExisting.md)
+        - In-flight PAF applications - > [08_PcInFlight](03_AppDoceumentation/08_PcInFlight.md)
     - Project Accountants
     - Project Wise team
 
