@@ -1,7 +1,6 @@
-# [dbo].People
+# [dbo].SMA_AT5
 
-People table contains all users that have access to the Onboarding Portal.
-Scope od access is determined by three columns: GroupID, Home_organisation and Project.
+SMA_AT5 is the main data table. It is system versioned
 
 ## Fields
 | Columne Name | Data Type | Length |
