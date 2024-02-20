@@ -1,13 +1,46 @@
 # SMPA Portal Application 
+
 This is repo with documentation for SMPA Portal Appliation.
 
 ## App details 
+
 The app frontend is build in MS PowerApps. Data is stored in MS SQL Server DB. 
 Backgound operations are run using PowerAutomate Flows. The app  is hosted in Highways England M365 Environment.
 
 The main scope of the application is to automate the process of approving employess assigned to work in SMP Project.  
 
+## Standards
+
+The app follows standards, such as naming convention and items organisation proposed by microsoft team: https://pahandsonlab.blob.core.windows.net/documents/PowerApps%20canvas%20app%20coding%20standards%20and%20guidelines.pdf
+
+#### Naming convention
+| Control name | Abbreviation |
+| ------------ | ------------ |
+| button | btn |
+| camera control  | cam |
+| canvas | can |
+| card | crd |
+| collection | col |
+| combo box | cmb |
+| dates | dte |
+| drop down | drp | 
+| form | frm |
+| gallery | gal |
+| group | grp |
+| header page shape | hdr |
+| html text | htm |
+| icon | ico |
+| image | img |
+| label | lbl |
+| page section shape | sec |
+| shapes (rectangle, circle, and so on) | shp |
+| table data | tbl |
+| text input | txt |
+| timer | tim |
+
+
 ## App Structure
+
 In the app menu on the [01_Intro](03_AppDoceumentation/01_Intro.md) Screen user can choose between two standard operations, that based on users access, directs them to different screens:
 * Approvals:
     - Budgetholders -> [04_Approvals](03_AppDoceumentation/04_Approvals.md)
@@ -48,6 +81,7 @@ flowchart TD
 ## App business logic
 
 ### Application submission
+
 Employees are applying for approval by submitting MS Forms
 - https://forms.office.com/Pages/ResponsePage.aspx?id=1aqQyyceHUCdNGlCVzIC6OZsSsVRHEtEswlfkRsxnU5UQU5SVkdZMjVPWFpERTlROTA1UFhITFJUVi4u
 
